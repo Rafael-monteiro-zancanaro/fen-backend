@@ -1,0 +1,47 @@
+databaseChangeLog:
+  - changeSet:
+      id: 'create_table_usuario'
+      author: 'rafael.zancanaro'
+      comment: 'Adiciona a tabela usuario ao projeto'
+      preConditions:
+        - onFail: WARN
+        - not:
+            - tableExists:
+                tableName: usuario
+      changes:
+        - createTable:
+            tableName: usuario
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: nome
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: cpf
+                  type: varchar(11)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: datanascimento
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(300)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: hashsenha
+                  type: varchar
+                  constraints:
+                    nullable: false
