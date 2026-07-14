@@ -1,4 +1,19 @@
 databaseChangeLog:
+  # 1. Primeiro, criar o schema de auditoria
+  - changeSet:
+      id: 'create_schema_aud'
+      author: 'rafael.zancanaro'
+      comment: 'Cria o schema para tabelas de auditoria'
+      preConditions:
+        - onFail: WARN
+        - sqlCheck:
+            expectedResult: '0'
+            sql: SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name = 'AUD'
+      changes:
+        - sql:
+            sql: CREATE SCHEMA IF NOT EXISTS aud
+
+  # 2. Depois, incluir todos os changesets das tabelas
   - includeAll:
       path: db/changelog/changes/
       errorIfMissingOrEmpty: true

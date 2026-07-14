@@ -1,17 +1,16 @@
 databaseChangeLog:
-  # Tabela principal do usuário (schema PUBLIC)
   - changeSet:
-      id: 'create_table_usuario'
+      id: 'create_table_farmaceutico'
       author: 'rafael.zancanaro'
-      comment: 'Adiciona a tabela usuario ao projeto'
+      comment: 'Adiciona a tabela farmaceutico ao projeto'
       preConditions:
         - onFail: WARN
         - not:
             - tableExists:
-                tableName: usuario
+                tableName: farmaceutico
       changes:
         - createTable:
-            tableName: usuario
+            tableName: farmaceutico
             columns:
               - column:
                   name: id
@@ -20,32 +19,14 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: nome
+                  name: crf
                   type: varchar(255)
                   constraints:
                     nullable: false
-              - column:
-                  name: cpf
-                  type: varchar(11)
-                  constraints:
-                    nullable: false
                     unique: true
               - column:
-                  name: datanascimento
-                  type: date
-                  constraints:
-                    nullable: false
-              - column:
-                  name: email
-                  type: varchar(300)
-                  constraints:
-                    unique: true
-                    nullable: false
-              - column:
-                  name: hashsenha
-                  type: varchar
-                  constraints:
-                    nullable: false
+                  name: responsaveltecnico
+                  type: boolean
               - column:
                   name: createdat
                   type: timestamp
@@ -58,19 +39,20 @@ databaseChangeLog:
               - column:
                   name: lastupdatedby
                   type: varchar(255)
+
   - changeSet:
-      id: 'create_table_usuario_aud'
+      id: 'create_table_farmaceutico_aud'
       author: 'rafael.zancanaro'
-      comment: 'Adiciona a tabela de auditoria usuario_aud no schema aud'
+      comment: 'Adiciona a tabela de auditoria farmaceutico_aud no schema aud'
       preConditions:
         - onFail: WARN
         - not:
             - tableExists:
                 schemaName: aud
-                tableName: usuario_aud
+                tableName: farmaceutico_aud
       changes:
         - createTable:
-            tableName: usuario_aud
+            tableName: farmaceutico_aud
             schemaName: aud
             columns:
               - column:
@@ -89,20 +71,11 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: nome
+                  name: crf
                   type: varchar(255)
               - column:
-                  name: cpf
-                  type: varchar(11)
-              - column:
-                  name: datanascimento
-                  type: date
-              - column:
-                  name: email
-                  type: varchar(300)
-              - column:
-                  name: hashsenha
-                  type: varchar
+                  name: responsaveltecnico
+                  type: boolean
               - column:
                   name: createdat
                   type: timestamp
@@ -116,7 +89,7 @@ databaseChangeLog:
                   name: lastupdatedby
                   type: varchar(255)
         - addPrimaryKey:
-            tableName: usuario_aud
+            tableName: farmaceutico_aud
             schemaName: aud
             columnNames: rev, id
-            constraintName: pk_usuario_aud
+            constraintName: pk_farmaceutico_aud
