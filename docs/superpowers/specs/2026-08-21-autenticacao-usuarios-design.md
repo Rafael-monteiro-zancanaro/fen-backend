@@ -93,6 +93,10 @@ Retorna o usuário resumido correspondente ao JWT válido. É usado para confirm
 
 Exige role `ADMIN` e lista dados necessários à análise de cadastros pendentes, incluindo o perfil profissional, sem credenciais.
 
+#### `GET /api/admin/usuarios/{id}`
+
+Exige role `ADMIN` e retorna os dados completos de usuário e funcionário necessários à análise de uma solicitação pendente, incluindo os dados profissionais específicos da role e a identificação do supervisor quando aplicável. Não retorna senha nem hash.
+
 #### `POST /api/admin/usuarios/{id}/aprovar`
 
 Exige role `ADMIN`, aceita apenas usuário pendente e o altera para ativo.
@@ -161,7 +165,8 @@ A URL da API virá da configuração de environment do Angular.
 - login passará a usar e-mail e senha reais, removerá o seletor temporário de role e apresentará falhas uniformes;
 - cadastro será convertido para Reactive Forms, enviará o contrato real e exibirá confirmação de que aguarda aprovação;
 - o seletor de supervisor consumirá o endpoint público e persistirá o UUID escolhido;
-- será criada uma tela administrativa de cadastros pendentes, com ações de aprovar e rejeitar;
+- será criada uma tela administrativa que lista os cadastros pendentes e abre cada solicitação para análise;
+- será criada uma tela de detalhes da solicitação, com todos os dados cadastrais e profissionais relevantes e as ações de aprovar ou rejeitar;
 - um guard autenticado protegerá todas as rotas de aplicação, exceto login, cadastro e recuperação de senha;
 - um guard de role protegerá rotas administrativas usando a role real;
 - `TemporaryAccessControl` será removido;
@@ -174,7 +179,7 @@ A URL da API virá da configuração de environment do Angular.
 
 - `UsuarioRepositoryTest` e `FuncionarioRepositoryTest` com H2/datasets: persistência, consulta por e-mail, unicidade, associação e supervisão;
 - services unitários: cadastro, normalização, BCrypt, duplicidade, validações por role, aprovação e rejeição;
-- controllers: requests válidos/inválidos, status e DTOs, login válido/inválido e proteção administrativa;
+- controllers: requests válidos/inválidos, status e DTOs, login válido/inválido, detalhe da solicitação e proteção administrativa;
 - serviço JWT: token válido, assinatura inválida e expiração configurável sem espera real;
 - `AuthenticationResourceITTest`: cadastro, aprovação, login, token, `/me`, `401` sem autenticação e `403` com role incorreta;
 - execução da suíte completa e validação do contexto Liquibase/Envers.
@@ -185,7 +190,7 @@ A URL da API virá da configuração de environment do Angular.
 - interceptor: inclusão de bearer token e comportamentos distintos de `401`/`403`;
 - guards: usuário ausente, role permitida e role insuficiente;
 - login e cadastro: payloads, sucesso, falha e pendência;
-- tela administrativa: listagem, aprovação e rejeição;
+- telas administrativas: listagem, navegação ao detalhe, apresentação dos dados, aprovação e rejeição;
 - build e suíte completa do Angular.
 
 ## Sequência de implementação
