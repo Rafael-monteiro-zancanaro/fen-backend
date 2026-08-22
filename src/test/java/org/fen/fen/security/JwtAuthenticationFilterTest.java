@@ -200,6 +200,9 @@ class JwtAuthenticationFilterTest {
         @Autowired
         private PasswordEncoder passwordEncoder;
 
+        @Autowired
+        private JwtService jwtService;
+
         @MockitoBean
         private UsuarioService usuarioService;
 
@@ -261,6 +264,21 @@ class JwtAuthenticationFilterTest {
 
             mockMvc.perform(get("/api/admin/usuarios/pendentes"))
                     .andExpect(status().isOk());
+        }
+
+        @Test
+        void staleAdminClaimCannotAuthorizeUserWhoseStoredRoleIsPharmacist() throws Exception {
+            Usuario tokenUser = usuario();
+            tokenUser.setRole(Role.ADMIN);
+            Usuario storedUser = usuario();
+            when(usuarioRepository.findById(USUARIO_ID)).thenReturn(Optional.of(storedUser));
+
+            String token = jwtService.issue(tokenUser, Instant.now()).token();
+
+            mockMvc.perform(get("/api/admin/usuarios/pendentes")
+                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.code").value("FORBIDDEN"));
         }
 
         @Test

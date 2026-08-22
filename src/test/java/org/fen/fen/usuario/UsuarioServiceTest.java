@@ -350,10 +350,9 @@ class UsuarioServiceTest {
         second.setId(UUID.fromString("00000000-0000-0000-0000-000000000212"));
         Funcionario firstProfile = funcionario(first, "Primeira", "11122233344");
         Funcionario secondProfile = funcionario(second, "Segunda", "55566677788");
-        when(usuarioRepository.findAllBySituacaoOrderByCreatedAtAsc(SituacaoUsuario.PENDENTE))
-                .thenReturn(List.of(first, second));
-        when(funcionarioRepository.findByUsuarioId(first.getId())).thenReturn(Optional.of(firstProfile));
-        when(funcionarioRepository.findByUsuarioId(second.getId())).thenReturn(Optional.of(secondProfile));
+        when(funcionarioRepository.findAllByUsuarioSituacaoOrderByUsuarioCreatedAtAsc(
+                SituacaoUsuario.PENDENTE
+        )).thenReturn(List.of(firstProfile, secondProfile));
 
         List<UsuarioPendenteSummaryResponse> responses = usuarioService.findPendentes();
 

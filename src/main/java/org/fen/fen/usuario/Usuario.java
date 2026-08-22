@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.fen.fen.infra.AuditableEntity;
 import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import java.util.Locale;
 
@@ -27,6 +28,7 @@ public class Usuario extends AuditableEntity {
     private String email;
 
     @Column(name = "passwordhash", nullable = false, length = 100)
+    @NotAudited
     private String passwordHash;
 
     @Enumerated(EnumType.STRING)

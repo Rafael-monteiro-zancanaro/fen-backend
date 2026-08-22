@@ -56,10 +56,6 @@ record FenUserDetails(
         );
     }
 
-    FenUserDetails withRole(Role authenticatedRole) {
-        return new FenUserDetails(userId, username, password, authenticatedRole, enabled);
-    }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));

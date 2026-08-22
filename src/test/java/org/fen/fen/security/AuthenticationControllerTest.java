@@ -21,6 +21,7 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -81,6 +82,23 @@ class AuthenticationControllerTest {
                 .thenThrow(new BadCredentialsException("internal password detail"));
 
         assertUniformUnauthorizedLogin();
+    }
+
+    @Test
+    void rejectsPasswordAboveBcryptUtf8ByteLimitBeforeAuthentication() throws Exception {
+        String password = "é".repeat(37);
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "email": "admin@fen.br",
+                                  "senha": "%s"
+                                }
+                                """.formatted(password)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors.senha").exists());
+        verifyNoInteractions(authenticationService);
     }
 
     @Test

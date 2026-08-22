@@ -68,8 +68,15 @@ class FuncionarioRepositoryTest extends BaseRepositoryTest {
     @Test
     void findsOnlyActiveNonInternSupervisorsOrderedByName() {
         assertThat(funcionarioRepository.findSupervisoresAtivos())
-                .extracting(Funcionario::getNome)
-                .containsExactly("Farmacêutica Ativa");
+                .extracting(
+                        Funcionario::getNome,
+                        funcionario -> funcionario.getUsuario().getRole()
+                )
+                .containsExactly(
+                        org.assertj.core.groups.Tuple.tuple("Administrador Elegível", Role.ADMIN),
+                        org.assertj.core.groups.Tuple.tuple("Farmacêutica Ativa", Role.FARMACEUTICO),
+                        org.assertj.core.groups.Tuple.tuple("Zélia Farmacêutica", Role.FARMACEUTICO)
+                );
     }
 
     private Usuario usuario(String email) {

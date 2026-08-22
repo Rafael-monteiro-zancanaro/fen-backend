@@ -73,11 +73,12 @@ public class UsuarioService {
 
     @Transactional(readOnly = true)
     public List<UsuarioPendenteSummaryResponse> findPendentes() {
-        return usuarioRepository.findAllBySituacaoOrderByCreatedAtAsc(SituacaoUsuario.PENDENTE)
+        return funcionarioRepository
+                .findAllByUsuarioSituacaoOrderByUsuarioCreatedAtAsc(SituacaoUsuario.PENDENTE)
                 .stream()
-                .map(usuario -> usuarioMapper.toPendenteSummary(
-                        usuario,
-                        findFuncionario(usuario.getId())
+                .map(funcionario -> usuarioMapper.toPendenteSummary(
+                        funcionario.getUsuario(),
+                        funcionario
                 ))
                 .toList();
     }

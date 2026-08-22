@@ -17,6 +17,7 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -73,6 +74,18 @@ class UsuarioControllerTest {
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.fieldErrors.email").exists());
+    }
+
+    @Test
+    void rejectsPasswordAboveBcryptUtf8ByteLimitBeforeRegistration() throws Exception {
+        String password = "é".repeat(37);
+
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validPharmacistJson().replace("segredo123", password)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors.senha").exists());
+        verifyNoInteractions(usuarioService);
     }
 
     @Test

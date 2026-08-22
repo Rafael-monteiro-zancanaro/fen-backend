@@ -48,7 +48,11 @@ class UsuarioRepositoryTest extends BaseRepositoryTest {
     void listsUsuariosBySituacaoInCreationOrder() {
         assertThat(usuarioRepository.findAllBySituacaoOrderByCreatedAtAsc(SituacaoUsuario.PENDENTE))
                 .extracting(Usuario::getEmail)
-                .containsExactly("pendente@fen.br");
+                .containsExactly(
+                        "primeira.pendente@fen.br",
+                        "pendente@fen.br",
+                        "ultima.pendente@fen.br"
+                );
     }
 
     private Usuario usuario(String email, String passwordHash) {

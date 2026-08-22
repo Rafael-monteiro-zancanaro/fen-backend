@@ -52,12 +52,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (!storedUser.isEnabled()) {
                 return;
             }
-            FenUserDetails principal = storedUser.withRole(jwtPrincipal.role());
             UsernamePasswordAuthenticationToken authentication =
                     UsernamePasswordAuthenticationToken.authenticated(
-                            principal,
+                            storedUser,
                             null,
-                            principal.getAuthorities()
+                            storedUser.getAuthorities()
                     );
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);

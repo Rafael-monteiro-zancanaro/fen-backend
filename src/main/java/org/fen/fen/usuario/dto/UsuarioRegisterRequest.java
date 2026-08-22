@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.fen.fen.usuario.Role;
 import org.fen.fen.usuario.TipoEstagio;
+import org.fen.fen.validation.Utf8ByteLength;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -18,7 +19,7 @@ public record UsuarioRegisterRequest(
         String cpf,
         LocalDate dataNascimento,
         @NotBlank @Email @Size(max = 254) String email,
-        @NotBlank @Size(min = 8, max = 72) String senha,
+        @NotBlank @Size(min = 8, max = 72) @Utf8ByteLength(max = 72) String senha,
         @NotNull Role role,
         @Size(max = 20) String crf,
         Boolean responsavelTecnico,
