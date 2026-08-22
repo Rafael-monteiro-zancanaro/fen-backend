@@ -1,5 +1,6 @@
 package org.fen.fen.error;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -43,6 +44,16 @@ public class ApiExceptionHandler {
                 HttpStatus.CONFLICT,
                 "CONFLICT",
                 exception.getMessage(),
+                Map.of()
+        );
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiError> handleDataIntegrityViolation() {
+        return response(
+                HttpStatus.CONFLICT,
+                "CONFLICT",
+                "E-mail ou CPF já cadastrado",
                 Map.of()
         );
     }

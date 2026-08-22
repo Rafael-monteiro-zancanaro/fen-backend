@@ -124,6 +124,35 @@ class UsuarioServiceTest {
     }
 
     @Test
+    void requiresTechnicalManagerChoiceForPharmacist() {
+        UsuarioRegisterRequest valid = pharmacistRequest();
+        UsuarioRegisterRequest request = new UsuarioRegisterRequest(
+                valid.nome(), valid.cpf(), valid.dataNascimento(), valid.email(), valid.senha(), valid.role(),
+                valid.crf(), null, valid.tipoEstagio(), valid.supervisorId(),
+                valid.inicioVigencia(), valid.fimVigencia()
+        );
+
+        assertThatThrownBy(() -> usuarioService.register(request))
+                .isInstanceOf(BusinessRuleException.class);
+        assertThat(savedUsuario).isNull();
+        assertThat(savedFuncionario).isNull();
+    }
+
+    @Test
+    void acceptsExplicitFalseTechnicalManagerChoiceForPharmacist() {
+        UsuarioRegisterRequest valid = pharmacistRequest();
+        UsuarioRegisterRequest request = new UsuarioRegisterRequest(
+                valid.nome(), valid.cpf(), valid.dataNascimento(), valid.email(), valid.senha(), valid.role(),
+                valid.crf(), false, valid.tipoEstagio(), valid.supervisorId(),
+                valid.inicioVigencia(), valid.fimVigencia()
+        );
+
+        usuarioService.register(request);
+
+        assertThat(savedFuncionario.getResponsavelTecnico()).isFalse();
+    }
+
+    @Test
     void requiresSupervisorForIntern() {
         UsuarioRegisterRequest request = internRequest(
                 null,

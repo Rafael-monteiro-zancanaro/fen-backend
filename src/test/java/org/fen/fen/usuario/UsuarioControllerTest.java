@@ -7,6 +7,7 @@ import org.fen.fen.usuario.dto.SupervisorResponse;
 import org.fen.fen.usuario.dto.UsuarioRegisterResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -75,6 +76,26 @@ class UsuarioControllerTest {
     }
 
     @Test
+    void acceptsEmailWithSurroundingWhitespaceThroughHttpValidation() throws Exception {
+        when(usuarioService.register(any())).thenReturn(new UsuarioRegisterResponse(
+                USUARIO_ID,
+                FUNCIONARIO_ID,
+                "nova@fen.br",
+                Role.FARMACEUTICO,
+                SituacaoUsuario.PENDENTE
+        ));
+
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validPharmacistJson().replace(
+                                "nova@fen.br",
+                                "  NOVA@FEN.BR  "
+                        )))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.email").value("nova@fen.br"));
+    }
+
+    @Test
     void returnsConflictForDuplicateRegistration() throws Exception {
         when(usuarioService.register(any())).thenThrow(new ConflictException("E-mail já cadastrado"));
 
@@ -85,6 +106,20 @@ class UsuarioControllerTest {
                 .andExpect(jsonPath("$.status").value(409))
                 .andExpect(jsonPath("$.code").value("CONFLICT"))
                 .andExpect(jsonPath("$.message").value("E-mail já cadastrado"));
+    }
+
+    @Test
+    void returnsConflictWhenDatabaseRejectsAConcurrentDuplicate() throws Exception {
+        when(usuarioService.register(any()))
+                .thenThrow(new DataIntegrityViolationException("unique constraint violation"));
+
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validPharmacistJson()))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.code").value("CONFLICT"))
+                .andExpect(jsonPath("$.message").value("E-mail ou CPF já cadastrado"));
     }
 
     @Test

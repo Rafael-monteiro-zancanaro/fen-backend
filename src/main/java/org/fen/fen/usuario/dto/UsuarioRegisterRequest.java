@@ -27,4 +27,9 @@ public record UsuarioRegisterRequest(
         LocalDate inicioVigencia,
         LocalDate fimVigencia
 ) {
+    public UsuarioRegisterRequest {
+        if (email != null) {
+            email = email.trim();
+        }
+    }
 }

@@ -11,9 +11,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 @Service
 public class UsuarioService {
+
+    private static final Set<Role> PUBLIC_REGISTRATION_ROLES = Set.of(
+            Role.FARMACEUTICO,
+            Role.ESTAGIARIO
+    );
 
     private final UsuarioRepository usuarioRepository;
     private final FuncionarioRepository funcionarioRepository;
@@ -62,12 +68,17 @@ public class UsuarioService {
     }
 
     private void validateRoleSpecificFields(UsuarioRegisterRequest request) {
-        if (request.role() == Role.ADMIN) {
-            throw new BusinessRuleException("Cadastro público não permite a role ADMIN");
+        if (!PUBLIC_REGISTRATION_ROLES.contains(request.role())) {
+            throw new BusinessRuleException("Role não permitida para cadastro público");
         }
         if (request.role() == Role.FARMACEUTICO
                 && (request.crf() == null || request.crf().isBlank())) {
             throw new BusinessRuleException("CRF é obrigatório para farmacêutico");
+        }
+        if (request.role() == Role.FARMACEUTICO && request.responsavelTecnico() == null) {
+            throw new BusinessRuleException(
+                    "Indicação de responsável técnico é obrigatória para farmacêutico"
+            );
         }
         if (request.role() == Role.ESTAGIARIO && request.supervisorId() == null) {
             throw new BusinessRuleException("Supervisor é obrigatório para estagiário");
