@@ -70,7 +70,9 @@ class AuditorAwareImplTest {
                     "spring.datasource.username=sa",
                     "spring.datasource.password=",
                     "spring.liquibase.enabled=false",
-                    "spring.jpa.hibernate.ddl-auto=none"
+                    "spring.jpa.hibernate.ddl-auto=none",
+                    "fen.security.jwt.secret=0123456789abcdef0123456789abcdef",
+                    "fen.security.jwt.expiration=8h"
             }
     )
     class AuditorRegistrationTest {
