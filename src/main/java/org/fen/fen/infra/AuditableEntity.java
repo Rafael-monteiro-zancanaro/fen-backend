@@ -21,21 +21,21 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @EqualsAndHashCode(callSuper=false)
-public class AuditableEntity extends WithSynteticId {
+public abstract class AuditableEntity extends WithSynteticId {
 
     @CreatedDate
     @Column(nullable = false, updatable = false, name="createdat")
     private LocalDateTime createdAt;
 
     @LastModifiedDate
-    @Column(name="lastupdatedat")
-    private LocalDateTime lastUpdatedAt;
+    @Column(name="updatedat")
+    private LocalDateTime updatedAt;
 
     @CreatedBy
     @Column(name="createdby")
     private String createdBy;
 
     @LastModifiedBy
-    @Column(name="lastupdatedby")
-    private String lastUpdatedBy;
+    @Column(name="updatedby")
+    private String updatedBy;
 }
