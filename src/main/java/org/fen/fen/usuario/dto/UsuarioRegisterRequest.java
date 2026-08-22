@@ -1,0 +1,30 @@
+package org.fen.fen.usuario.dto;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import org.fen.fen.usuario.Role;
+import org.fen.fen.usuario.TipoEstagio;
+
+import java.time.LocalDate;
+import java.util.UUID;
+
+public record UsuarioRegisterRequest(
+        @NotBlank @Size(max = 150) String nome,
+        @NotBlank
+        @Pattern(regexp = "(?:\\d{11}|\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2})")
+        String cpf,
+        LocalDate dataNascimento,
+        @NotBlank @Email @Size(max = 254) String email,
+        @NotBlank @Size(min = 8, max = 72) String senha,
+        @NotNull Role role,
+        @Size(max = 20) String crf,
+        Boolean responsavelTecnico,
+        TipoEstagio tipoEstagio,
+        UUID supervisorId,
+        LocalDate inicioVigencia,
+        LocalDate fimVigencia
+) {
+}
