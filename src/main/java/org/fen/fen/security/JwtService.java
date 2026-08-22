@@ -31,10 +31,18 @@ public class JwtService {
     }
 
     public IssuedToken issue(Usuario usuario, Instant now) {
+        return issue(usuario.getId(), usuario.getRole(), now);
+    }
+
+    IssuedToken issue(FenUserDetails principal, Instant now) {
+        return issue(principal.userId(), principal.role(), now);
+    }
+
+    private IssuedToken issue(UUID userId, Role role, Instant now) {
         Instant expiresAt = now.plus(properties.expiration());
         String token = Jwts.builder()
-                .subject(usuario.getId().toString())
-                .claim(ROLE_CLAIM, usuario.getRole().name())
+                .subject(userId.toString())
+                .claim(ROLE_CLAIM, role.name())
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiresAt))
                 .signWith(signingKey)

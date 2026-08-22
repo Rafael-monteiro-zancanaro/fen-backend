@@ -2,8 +2,7 @@ INSERT INTO usuario (id, email, passwordhash, role, situacao, createdat, updated
 VALUES
     ('00000000-0000-0000-0000-000000000101', 'farma@fen.br', 'hash', 'FARMACEUTICO', 'ATIVO', TIMESTAMP '2026-08-21 08:00:00', NULL, 'Sistema', NULL),
     ('00000000-0000-0000-0000-000000000102', 'pendente@fen.br', 'hash', 'FARMACEUTICO', 'PENDENTE', TIMESTAMP '2026-08-21 09:00:00', NULL, 'Sistema', NULL),
-    ('00000000-0000-0000-0000-000000000103', 'estagiaria@fen.br', 'hash', 'ESTAGIARIO', 'ATIVO', TIMESTAMP '2026-08-21 10:00:00', NULL, 'Sistema', NULL),
-    ('00000000-0000-0000-0000-000000000104', 'admin@fen.br', 'hash', 'ADMIN', 'ATIVO', TIMESTAMP '2026-08-21 11:00:00', NULL, 'Sistema', NULL);
+    ('00000000-0000-0000-0000-000000000103', 'estagiaria@fen.br', 'hash', 'ESTAGIARIO', 'ATIVO', TIMESTAMP '2026-08-21 10:00:00', NULL, 'Sistema', NULL);
 
 INSERT INTO funcionario (id, usuarioid, nome, cpf, datanascimento, crf, responsaveltecnico,
                          tipoestagio, supervisorid, iniciovigencia, fimvigencia,

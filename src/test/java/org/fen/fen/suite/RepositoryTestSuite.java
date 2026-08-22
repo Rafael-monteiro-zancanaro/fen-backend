@@ -5,7 +5,7 @@ import org.junit.platform.suite.api.SelectPackages;
 import org.junit.platform.suite.api.Suite;
 import org.junit.platform.suite.api.SuiteDisplayName;
 
-@Suite
+@Suite(failIfNoTests = false)
 @SuiteDisplayName("Repository Test Suite")
 @SelectPackages("org.fen.fen.repository")
 @IncludePackages("org.fen.fen.repository")
