@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -43,6 +44,16 @@ public class ApiExceptionHandler {
         return response(
                 HttpStatus.CONFLICT,
                 "CONFLICT",
+                exception.getMessage(),
+                Map.of()
+        );
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<ApiError> handleNotFound(NoSuchElementException exception) {
+        return response(
+                HttpStatus.NOT_FOUND,
+                "NOT_FOUND",
                 exception.getMessage(),
                 Map.of()
         );

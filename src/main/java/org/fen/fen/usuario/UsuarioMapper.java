@@ -3,6 +3,8 @@ package org.fen.fen.usuario;
 import org.fen.fen.usuario.dto.UsuarioRegisterRequest;
 import org.fen.fen.usuario.dto.UsuarioRegisterResponse;
 import org.fen.fen.usuario.dto.SupervisorResponse;
+import org.fen.fen.usuario.dto.UsuarioPendenteDetailResponse;
+import org.fen.fen.usuario.dto.UsuarioPendenteSummaryResponse;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -51,5 +53,45 @@ public class UsuarioMapper {
 
     public SupervisorResponse toSupervisorResponse(Funcionario funcionario) {
         return new SupervisorResponse(funcionario.getId(), funcionario.getNome());
+    }
+
+    public UsuarioPendenteSummaryResponse toPendenteSummary(
+            Usuario usuario,
+            Funcionario funcionario
+    ) {
+        return new UsuarioPendenteSummaryResponse(
+                usuario.getId(),
+                funcionario.getNome(),
+                usuario.getEmail(),
+                funcionario.getCpf(),
+                usuario.getRole(),
+                usuario.getCreatedAt()
+        );
+    }
+
+    public UsuarioPendenteDetailResponse toPendenteDetail(
+            Usuario usuario,
+            Funcionario funcionario
+    ) {
+        SupervisorResponse supervisor = funcionario.getSupervisor() == null
+                ? null
+                : toSupervisorResponse(funcionario.getSupervisor());
+        return new UsuarioPendenteDetailResponse(
+                usuario.getId(),
+                funcionario.getId(),
+                funcionario.getNome(),
+                usuario.getEmail(),
+                funcionario.getCpf(),
+                funcionario.getDataNascimento(),
+                usuario.getRole(),
+                usuario.getSituacao(),
+                usuario.getCreatedAt(),
+                funcionario.getCrf(),
+                funcionario.getResponsavelTecnico(),
+                funcionario.getTipoEstagio(),
+                supervisor,
+                funcionario.getInicioVigencia(),
+                funcionario.getFimVigencia()
+        );
     }
 }

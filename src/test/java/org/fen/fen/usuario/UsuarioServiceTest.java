@@ -5,6 +5,8 @@ import org.fen.fen.error.ConflictException;
 import org.fen.fen.usuario.dto.UsuarioRegisterRequest;
 import org.fen.fen.usuario.dto.UsuarioRegisterResponse;
 import org.fen.fen.usuario.dto.SupervisorResponse;
+import org.fen.fen.usuario.dto.UsuarioPendenteDetailResponse;
+import org.fen.fen.usuario.dto.UsuarioPendenteSummaryResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,14 +17,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -325,6 +332,200 @@ class UsuarioServiceTest {
         assertThat(transactional.readOnly()).isFalse();
     }
 
+    @Test
+    void listsPendingRegistrationsInCreationOrderWithoutCredentials() {
+        Usuario first = usuario(
+                "primeira@fen.br",
+                Role.FARMACEUTICO,
+                SituacaoUsuario.PENDENTE,
+                LocalDateTime.of(2026, 8, 20, 9, 0)
+        );
+        first.setId(UUID.fromString("00000000-0000-0000-0000-000000000211"));
+        Usuario second = usuario(
+                "segunda@fen.br",
+                Role.ESTAGIARIO,
+                SituacaoUsuario.PENDENTE,
+                LocalDateTime.of(2026, 8, 21, 10, 0)
+        );
+        second.setId(UUID.fromString("00000000-0000-0000-0000-000000000212"));
+        Funcionario firstProfile = funcionario(first, "Primeira", "11122233344");
+        Funcionario secondProfile = funcionario(second, "Segunda", "55566677788");
+        when(usuarioRepository.findAllBySituacaoOrderByCreatedAtAsc(SituacaoUsuario.PENDENTE))
+                .thenReturn(List.of(first, second));
+        when(funcionarioRepository.findByUsuarioId(first.getId())).thenReturn(Optional.of(firstProfile));
+        when(funcionarioRepository.findByUsuarioId(second.getId())).thenReturn(Optional.of(secondProfile));
+
+        List<UsuarioPendenteSummaryResponse> responses = usuarioService.findPendentes();
+
+        assertThat(responses).containsExactly(
+                new UsuarioPendenteSummaryResponse(
+                        first.getId(), "Primeira", "primeira@fen.br", "11122233344",
+                        Role.FARMACEUTICO, LocalDateTime.of(2026, 8, 20, 9, 0)
+                ),
+                new UsuarioPendenteSummaryResponse(
+                        second.getId(), "Segunda", "segunda@fen.br", "55566677788",
+                        Role.ESTAGIARIO, LocalDateTime.of(2026, 8, 21, 10, 0)
+                )
+        );
+    }
+
+    @Test
+    void returnsFullPendingPharmacistDetailWithoutCredentials() {
+        Usuario usuario = usuario(
+                "farmaceutica@fen.br",
+                Role.FARMACEUTICO,
+                SituacaoUsuario.PENDENTE,
+                LocalDateTime.of(2026, 8, 21, 11, 0)
+        );
+        Funcionario funcionario = funcionario(usuario, "Ana Farmacêutica", "12345678901");
+        funcionario.setDataNascimento(LocalDate.of(1990, 1, 2));
+        funcionario.setCrf("PR-54321");
+        funcionario.setResponsavelTecnico(true);
+        when(usuarioRepository.findById(usuario.getId())).thenReturn(Optional.of(usuario));
+        when(funcionarioRepository.findByUsuarioId(usuario.getId())).thenReturn(Optional.of(funcionario));
+
+        UsuarioPendenteDetailResponse response = usuarioService.findPendente(usuario.getId());
+
+        assertThat(response).isEqualTo(new UsuarioPendenteDetailResponse(
+                usuario.getId(), funcionario.getId(), "Ana Farmacêutica", "farmaceutica@fen.br",
+                "12345678901", LocalDate.of(1990, 1, 2), Role.FARMACEUTICO,
+                SituacaoUsuario.PENDENTE, LocalDateTime.of(2026, 8, 21, 11, 0),
+                "PR-54321", true, null, null, null, null
+        ));
+    }
+
+    @Test
+    void returnsFullPendingInternDetailWithSupervisor() {
+        Usuario usuario = usuario(
+                "estagiaria@fen.br",
+                Role.ESTAGIARIO,
+                SituacaoUsuario.PENDENTE,
+                LocalDateTime.of(2026, 8, 21, 12, 0)
+        );
+        Funcionario funcionario = funcionario(usuario, "Bia Estagiária", "98765432100");
+        funcionario.setDataNascimento(LocalDate.of(2002, 2, 3));
+        funcionario.setTipoEstagio(TipoEstagio.NAO_OBRIGATORIO);
+        funcionario.setInicioVigencia(LocalDate.of(2026, 8, 1));
+        funcionario.setFimVigencia(LocalDate.of(2026, 12, 15));
+        Funcionario supervisor = supervisor(Role.FARMACEUTICO, SituacaoUsuario.ATIVO);
+        supervisor.setNome("Carla Supervisora");
+        funcionario.setSupervisor(supervisor);
+        when(usuarioRepository.findById(usuario.getId())).thenReturn(Optional.of(usuario));
+        when(funcionarioRepository.findByUsuarioId(usuario.getId())).thenReturn(Optional.of(funcionario));
+
+        UsuarioPendenteDetailResponse response = usuarioService.findPendente(usuario.getId());
+
+        assertThat(response).isEqualTo(new UsuarioPendenteDetailResponse(
+                usuario.getId(), funcionario.getId(), "Bia Estagiária", "estagiaria@fen.br",
+                "98765432100", LocalDate.of(2002, 2, 3), Role.ESTAGIARIO,
+                SituacaoUsuario.PENDENTE, LocalDateTime.of(2026, 8, 21, 12, 0),
+                null, null, TipoEstagio.NAO_OBRIGATORIO,
+                new SupervisorResponse(supervisor.getId(), "Carla Supervisora"),
+                LocalDate.of(2026, 8, 1), LocalDate.of(2026, 12, 15)
+        ));
+    }
+
+    @Test
+    void rejectsDetailForActiveUser() {
+        Usuario usuario = usuario(
+                "ativa@fen.br",
+                Role.FARMACEUTICO,
+                SituacaoUsuario.ATIVO,
+                LocalDateTime.of(2026, 8, 21, 13, 0)
+        );
+        when(usuarioRepository.findById(usuario.getId())).thenReturn(Optional.of(usuario));
+
+        assertThatThrownBy(() -> usuarioService.findPendente(usuario.getId()))
+                .isInstanceOf(BusinessRuleException.class);
+        verify(funcionarioRepository, never()).findByUsuarioId(any());
+    }
+
+    @Test
+    void reportsMissingPendingUser() {
+        UUID missingId = UUID.fromString("00000000-0000-0000-0000-000000000299");
+
+        assertThatThrownBy(() -> usuarioService.findPendente(missingId))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    void approvesPendingUserWithinTransaction() throws NoSuchMethodException {
+        Usuario usuario = usuario(
+                "aprovar@fen.br",
+                Role.FARMACEUTICO,
+                SituacaoUsuario.PENDENTE,
+                LocalDateTime.of(2026, 8, 21, 14, 0)
+        );
+        when(usuarioRepository.findById(usuario.getId())).thenReturn(Optional.of(usuario));
+
+        usuarioService.aprovar(usuario.getId());
+
+        assertThat(usuario.getSituacao()).isEqualTo(SituacaoUsuario.ATIVO);
+        verify(usuarioRepository).save(usuario);
+        Transactional transactional = UsuarioService.class
+                .getMethod("aprovar", UUID.class)
+                .getAnnotation(Transactional.class);
+        assertThat(transactional).isNotNull();
+        assertThat(transactional.readOnly()).isFalse();
+    }
+
+    @Test
+    void refusesToApproveActiveUser() {
+        Usuario usuario = usuario(
+                "ativa@fen.br",
+                Role.FARMACEUTICO,
+                SituacaoUsuario.ATIVO,
+                LocalDateTime.of(2026, 8, 21, 15, 0)
+        );
+        when(usuarioRepository.findById(usuario.getId())).thenReturn(Optional.of(usuario));
+
+        assertThatThrownBy(() -> usuarioService.aprovar(usuario.getId()))
+                .isInstanceOf(BusinessRuleException.class);
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    void rejectsPendingUserByDeletingProfileBeforeCredentialsWithinTransaction()
+            throws NoSuchMethodException {
+        Usuario usuario = usuario(
+                "rejeitar@fen.br",
+                Role.FARMACEUTICO,
+                SituacaoUsuario.PENDENTE,
+                LocalDateTime.of(2026, 8, 21, 16, 0)
+        );
+        Funcionario funcionario = funcionario(usuario, "Rejeitada", "11133355577");
+        when(usuarioRepository.findById(usuario.getId())).thenReturn(Optional.of(usuario));
+        when(funcionarioRepository.findByUsuarioId(usuario.getId())).thenReturn(Optional.of(funcionario));
+
+        usuarioService.rejeitar(usuario.getId());
+
+        var deletionOrder = inOrder(funcionarioRepository, usuarioRepository);
+        deletionOrder.verify(funcionarioRepository).delete(funcionario);
+        deletionOrder.verify(funcionarioRepository).flush();
+        deletionOrder.verify(usuarioRepository).delete(usuario);
+        Transactional transactional = UsuarioService.class
+                .getMethod("rejeitar", UUID.class)
+                .getAnnotation(Transactional.class);
+        assertThat(transactional).isNotNull();
+        assertThat(transactional.readOnly()).isFalse();
+    }
+
+    @Test
+    void refusesToRejectActiveUserWithoutDeletingIdentifiers() {
+        Usuario usuario = usuario(
+                "ativa@fen.br",
+                Role.FARMACEUTICO,
+                SituacaoUsuario.ATIVO,
+                LocalDateTime.of(2026, 8, 21, 17, 0)
+        );
+        when(usuarioRepository.findById(usuario.getId())).thenReturn(Optional.of(usuario));
+
+        assertThatThrownBy(() -> usuarioService.rejeitar(usuario.getId()))
+                .isInstanceOf(BusinessRuleException.class);
+        verify(funcionarioRepository, never()).delete(any());
+        verify(usuarioRepository, never()).delete(any());
+    }
+
     private UsuarioRegisterRequest pharmacistRequest() {
         return pharmacistRequest(Role.FARMACEUTICO);
     }
@@ -380,6 +581,31 @@ class UsuarioServiceTest {
         funcionario.setId(UUID.fromString("00000000-0000-0000-0000-000000000203"));
         funcionario.setUsuario(usuario);
         funcionario.setNome("Supervisora");
+        return funcionario;
+    }
+
+    private Usuario usuario(
+            String email,
+            Role role,
+            SituacaoUsuario situacao,
+            LocalDateTime createdAt
+    ) {
+        Usuario usuario = new Usuario();
+        usuario.setId(UUID.fromString("00000000-0000-0000-0000-000000000210"));
+        usuario.setEmail(email);
+        usuario.setPasswordHash("hash-secreto");
+        usuario.setRole(role);
+        usuario.setSituacao(situacao);
+        usuario.setCreatedAt(createdAt);
+        return usuario;
+    }
+
+    private Funcionario funcionario(Usuario usuario, String nome, String cpf) {
+        Funcionario funcionario = new Funcionario();
+        funcionario.setId(UUID.fromString("00000000-0000-0000-0000-000000000220"));
+        funcionario.setUsuario(usuario);
+        funcionario.setNome(nome);
+        funcionario.setCpf(cpf);
         return funcionario;
     }
 }

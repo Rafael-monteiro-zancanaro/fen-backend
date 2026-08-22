@@ -5,13 +5,17 @@ import org.fen.fen.error.ConflictException;
 import org.fen.fen.usuario.dto.UsuarioRegisterRequest;
 import org.fen.fen.usuario.dto.UsuarioRegisterResponse;
 import org.fen.fen.usuario.dto.SupervisorResponse;
+import org.fen.fen.usuario.dto.UsuarioPendenteDetailResponse;
+import org.fen.fen.usuario.dto.UsuarioPendenteSummaryResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 public class UsuarioService {
@@ -67,6 +71,39 @@ public class UsuarioService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<UsuarioPendenteSummaryResponse> findPendentes() {
+        return usuarioRepository.findAllBySituacaoOrderByCreatedAtAsc(SituacaoUsuario.PENDENTE)
+                .stream()
+                .map(usuario -> usuarioMapper.toPendenteSummary(
+                        usuario,
+                        findFuncionario(usuario.getId())
+                ))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public UsuarioPendenteDetailResponse findPendente(UUID id) {
+        Usuario usuario = findPendingUsuario(id);
+        return usuarioMapper.toPendenteDetail(usuario, findFuncionario(id));
+    }
+
+    @Transactional
+    public void aprovar(UUID id) {
+        Usuario usuario = findPendingUsuario(id);
+        usuario.setSituacao(SituacaoUsuario.ATIVO);
+        usuarioRepository.save(usuario);
+    }
+
+    @Transactional
+    public void rejeitar(UUID id) {
+        Usuario usuario = findPendingUsuario(id);
+        Funcionario funcionario = findFuncionario(id);
+        funcionarioRepository.delete(funcionario);
+        funcionarioRepository.flush();
+        usuarioRepository.delete(usuario);
+    }
+
     private void validateRoleSpecificFields(UsuarioRegisterRequest request) {
         if (!PUBLIC_REGISTRATION_ROLES.contains(request.role())) {
             throw new BusinessRuleException("Role não permitida para cadastro público");
@@ -120,5 +157,19 @@ public class UsuarioService {
         if (funcionarioRepository.existsByCpf(normalizedCpf)) {
             throw new ConflictException("CPF já cadastrado");
         }
+    }
+
+    private Usuario findPendingUsuario(UUID id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado"));
+        if (usuario.getSituacao() != SituacaoUsuario.PENDENTE) {
+            throw new BusinessRuleException("Usuário não possui cadastro pendente");
+        }
+        return usuario;
+    }
+
+    private Funcionario findFuncionario(UUID usuarioId) {
+        return funcionarioRepository.findByUsuarioId(usuarioId)
+                .orElseThrow(() -> new NoSuchElementException("Funcionário não encontrado"));
     }
 }
