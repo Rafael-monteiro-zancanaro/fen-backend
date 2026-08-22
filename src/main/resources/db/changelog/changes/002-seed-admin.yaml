@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-seed-admin
+      author: codex
+      context: "@dev or @test"
+      changes:
+        - insert:
+            tableName: usuario
+            columns:
+              - column:
+                  name: id
+                  value: 00000000-0000-0000-0000-000000000001
+              - column:
+                  name: email
+                  value: admin@fen.br
+              - column:
+                  name: passwordhash
+                  value: '$2a$10$qd1i3rFWG/IGuAetEkepKOZphFx4mmPm4MMMAj8VMmyGRI0wehdCq'
+              - column:
+                  name: role
+                  value: ADMIN
+              - column:
+                  name: situacao
+                  value: ATIVO
+              - column:
+                  name: createdat
+                  valueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: updatedat
+                  valueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: createdby
+                  value: Sistema
+              - column:
+                  name: updatedby
+                  value: Sistema
