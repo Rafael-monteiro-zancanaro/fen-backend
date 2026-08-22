@@ -1,8 +1,10 @@
 package org.fen.fen.repository;
 
+import org.fen.fen.config.AuditingConfig;
 import org.junit.jupiter.api.Tag;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -12,6 +14,7 @@ import org.springframework.test.context.DynamicPropertySource;
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = {})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import(AuditingConfig.class)
 @Tag("repository")
 public class BaseRepositoryTest {
 

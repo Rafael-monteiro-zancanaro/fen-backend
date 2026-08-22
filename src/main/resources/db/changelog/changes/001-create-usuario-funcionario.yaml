@@ -1,0 +1,275 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-usuario-funcionario
+      author: codex
+      changes:
+        - createTable:
+            tableName: usuario
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(254)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: passwordhash
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: situacao
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: createdat
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updatedat
+                  type: timestamp
+              - column:
+                  name: createdby
+                  type: varchar(255)
+              - column:
+                  name: updatedby
+                  type: varchar(255)
+        - addUniqueConstraint:
+            tableName: usuario
+            columnNames: email
+            constraintName: uk_usuario_email
+
+        - createTable:
+            tableName: funcionario
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: usuarioid
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: nome
+                  type: varchar(150)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: cpf
+                  type: varchar(11)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: datanascimento
+                  type: date
+              - column:
+                  name: crf
+                  type: varchar(20)
+              - column:
+                  name: responsaveltecnico
+                  type: boolean
+              - column:
+                  name: tipoestagio
+                  type: varchar(20)
+              - column:
+                  name: supervisorid
+                  type: uuid
+              - column:
+                  name: iniciovigencia
+                  type: date
+              - column:
+                  name: fimvigencia
+                  type: date
+              - column:
+                  name: createdat
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updatedat
+                  type: timestamp
+              - column:
+                  name: createdby
+                  type: varchar(255)
+              - column:
+                  name: updatedby
+                  type: varchar(255)
+        - addUniqueConstraint:
+            tableName: funcionario
+            columnNames: usuarioid
+            constraintName: uk_funcionario_usuario
+        - addUniqueConstraint:
+            tableName: funcionario
+            columnNames: cpf
+            constraintName: uk_funcionario_cpf
+        - addForeignKeyConstraint:
+            baseTableName: funcionario
+            baseColumnNames: usuarioid
+            referencedTableName: usuario
+            referencedColumnNames: id
+            constraintName: fk_funcionario_usuario
+        - addForeignKeyConstraint:
+            baseTableName: funcionario
+            baseColumnNames: supervisorid
+            referencedTableName: funcionario
+            referencedColumnNames: id
+            constraintName: fk_funcionario_supervisor
+
+        - createTable:
+            schemaName: aud
+            tableName: revinfo
+            columns:
+              - column:
+                  name: rev
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: revtstmp
+                  type: bigint
+
+        - createTable:
+            schemaName: aud
+            tableName: usuario_aud
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: rev
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: revtype
+                  type: smallint
+              - column:
+                  name: email
+                  type: varchar(254)
+              - column:
+                  name: passwordhash
+                  type: varchar(100)
+              - column:
+                  name: role
+                  type: varchar(20)
+              - column:
+                  name: situacao
+                  type: varchar(20)
+              - column:
+                  name: createdat
+                  type: timestamp
+              - column:
+                  name: updatedat
+                  type: timestamp
+              - column:
+                  name: createdby
+                  type: varchar(255)
+              - column:
+                  name: updatedby
+                  type: varchar(255)
+        - addPrimaryKey:
+            schemaName: aud
+            tableName: usuario_aud
+            columnNames: id, rev
+            constraintName: pk_usuario_aud
+        - addForeignKeyConstraint:
+            baseTableSchemaName: aud
+            baseTableName: usuario_aud
+            baseColumnNames: rev
+            referencedTableSchemaName: aud
+            referencedTableName: revinfo
+            referencedColumnNames: rev
+            constraintName: fk_usuario_aud_rev
+
+        - createTable:
+            schemaName: aud
+            tableName: funcionario_aud
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: rev
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: revtype
+                  type: smallint
+              - column:
+                  name: usuarioid
+                  type: uuid
+              - column:
+                  name: nome
+                  type: varchar(150)
+              - column:
+                  name: cpf
+                  type: varchar(11)
+              - column:
+                  name: datanascimento
+                  type: date
+              - column:
+                  name: crf
+                  type: varchar(20)
+              - column:
+                  name: responsaveltecnico
+                  type: boolean
+              - column:
+                  name: tipoestagio
+                  type: varchar(20)
+              - column:
+                  name: supervisorid
+                  type: uuid
+              - column:
+                  name: iniciovigencia
+                  type: date
+              - column:
+                  name: fimvigencia
+                  type: date
+              - column:
+                  name: createdat
+                  type: timestamp
+              - column:
+                  name: updatedat
+                  type: timestamp
+              - column:
+                  name: createdby
+                  type: varchar(255)
+              - column:
+                  name: updatedby
+                  type: varchar(255)
+        - addPrimaryKey:
+            schemaName: aud
+            tableName: funcionario_aud
+            columnNames: id, rev
+            constraintName: pk_funcionario_aud
+        - addForeignKeyConstraint:
+            baseTableSchemaName: aud
+            baseTableName: funcionario_aud
+            baseColumnNames: rev
+            referencedTableSchemaName: aud
+            referencedTableName: revinfo
+            referencedColumnNames: rev
+            constraintName: fk_funcionario_aud_rev
