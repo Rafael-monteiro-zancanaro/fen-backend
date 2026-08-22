@@ -94,6 +94,11 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
+    void blankBearerTokenLeavesContextEmptyAndProtectedRequestReturnsJson401() throws Exception {
+        assertRejectedBearerToken("", jwtService(NOW));
+    }
+
+    @Test
     void expiredTokenLeavesContextEmptyAndProtectedRequestReturnsJson401() throws Exception {
         JwtService issuingService = jwtService(NOW);
         String token = issuingService.issue(usuario(), NOW).token();
@@ -226,6 +231,15 @@ class JwtAuthenticationFilterTest {
         @Test
         void unauthenticatedAdminRequestReturnsJson401() throws Exception {
             mockMvc.perform(get("/api/admin/usuarios/pendentes"))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.status").value(401))
+                    .andExpect(jsonPath("$.code").value("UNAUTHORIZED"));
+        }
+
+        @Test
+        void blankBearerTokenOnProtectedRequestReturnsJson401() throws Exception {
+            mockMvc.perform(get("/api/admin/usuarios/pendentes")
+                            .header(HttpHeaders.AUTHORIZATION, "Bearer "))
                     .andExpect(status().isUnauthorized())
                     .andExpect(jsonPath("$.status").value(401))
                     .andExpect(jsonPath("$.code").value("UNAUTHORIZED"));

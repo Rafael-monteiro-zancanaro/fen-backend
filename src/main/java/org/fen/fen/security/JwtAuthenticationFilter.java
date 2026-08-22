@@ -37,7 +37,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (SecurityContextHolder.getContext().getAuthentication() == null
                 && authorization != null
                 && authorization.startsWith(BEARER_PREFIX)) {
-            authenticate(authorization.substring(BEARER_PREFIX.length()), request);
+            String token = authorization.substring(BEARER_PREFIX.length()).trim();
+            if (!token.isEmpty()) {
+                authenticate(token, request);
+            }
         }
         filterChain.doFilter(request, response);
     }
