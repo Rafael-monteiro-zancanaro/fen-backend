@@ -1,5 +1,7 @@
-package org.fen.fen.usuario;
+package org.fen.fen.repository;
 
+import org.fen.fen.domain.SituacaoUsuario;
+import org.fen.fen.domain.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

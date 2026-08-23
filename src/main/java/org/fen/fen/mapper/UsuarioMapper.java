@@ -1,10 +1,14 @@
-package org.fen.fen.usuario;
+package org.fen.fen.mapper;
 
-import org.fen.fen.usuario.dto.UsuarioRegisterRequest;
-import org.fen.fen.usuario.dto.UsuarioRegisterResponse;
-import org.fen.fen.usuario.dto.SupervisorResponse;
-import org.fen.fen.usuario.dto.UsuarioPendenteDetailResponse;
-import org.fen.fen.usuario.dto.UsuarioPendenteSummaryResponse;
+import org.fen.fen.domain.Funcionario;
+import org.fen.fen.domain.Role;
+import org.fen.fen.domain.SituacaoUsuario;
+import org.fen.fen.domain.Usuario;
+import org.fen.fen.domain.dto.UsuarioRegisterRequest;
+import org.fen.fen.domain.dto.UsuarioRegisterResponse;
+import org.fen.fen.domain.dto.SupervisorResponse;
+import org.fen.fen.domain.dto.UsuarioPendenteDetailResponse;
+import org.fen.fen.domain.dto.UsuarioPendenteSummaryResponse;
 import org.springframework.stereotype.Component;
 
 @Component

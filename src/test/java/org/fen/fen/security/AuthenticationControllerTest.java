@@ -4,7 +4,7 @@ import org.fen.fen.error.ApiExceptionHandler;
 import org.fen.fen.security.dto.AuthUserResponse;
 import org.fen.fen.security.dto.LoginRequest;
 import org.fen.fen.security.dto.LoginResponse;
-import org.fen.fen.usuario.Role;
+import org.fen.fen.domain.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;

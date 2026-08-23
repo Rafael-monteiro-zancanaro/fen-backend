@@ -1,5 +1,7 @@
-package org.fen.fen.usuario;
+package org.fen.fen.repository;
 
+import org.fen.fen.domain.Funcionario;
+import org.fen.fen.domain.SituacaoUsuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -29,10 +31,10 @@ public interface FuncionarioRepository extends JpaRepository<Funcionario, UUID> 
             select funcionario
             from Funcionario funcionario
             join fetch funcionario.usuario usuario
-            where usuario.situacao = org.fen.fen.usuario.SituacaoUsuario.ATIVO
+            where usuario.situacao = org.fen.fen.domain.SituacaoUsuario.ATIVO
               and usuario.role in (
-                  org.fen.fen.usuario.Role.ADMIN,
-                  org.fen.fen.usuario.Role.FARMACEUTICO
+                  org.fen.fen.domain.Role.ADMIN,
+                  org.fen.fen.domain.Role.FARMACEUTICO
               )
             order by funcionario.nome
             """)

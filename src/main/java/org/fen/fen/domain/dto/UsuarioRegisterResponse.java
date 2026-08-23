@@ -1,7 +1,7 @@
-package org.fen.fen.usuario.dto;
+package org.fen.fen.domain.dto;
 
-import org.fen.fen.usuario.Role;
-import org.fen.fen.usuario.SituacaoUsuario;
+import org.fen.fen.domain.Role;
+import org.fen.fen.domain.SituacaoUsuario;
 
 import java.util.UUID;
 

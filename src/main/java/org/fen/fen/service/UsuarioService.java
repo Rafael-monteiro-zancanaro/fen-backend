@@ -1,15 +1,22 @@
-package org.fen.fen.usuario;
+package org.fen.fen.service;
 
+import org.fen.fen.domain.Funcionario;
+import org.fen.fen.domain.Role;
+import org.fen.fen.domain.SituacaoUsuario;
+import org.fen.fen.domain.Usuario;
 import org.fen.fen.error.BusinessRuleException;
 import org.fen.fen.error.ConflictException;
-import org.fen.fen.usuario.dto.UsuarioRegisterRequest;
-import org.fen.fen.usuario.dto.UsuarioRegisterResponse;
-import org.fen.fen.usuario.dto.SupervisorResponse;
-import org.fen.fen.usuario.dto.UsuarioPendenteDetailResponse;
-import org.fen.fen.usuario.dto.UsuarioPendenteSummaryResponse;
+import org.fen.fen.mapper.UsuarioMapper;
+import org.fen.fen.domain.dto.UsuarioRegisterRequest;
+import org.fen.fen.domain.dto.UsuarioRegisterResponse;
+import org.fen.fen.domain.dto.SupervisorResponse;
+import org.fen.fen.domain.dto.UsuarioPendenteDetailResponse;
+import org.fen.fen.domain.dto.UsuarioPendenteSummaryResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.fen.fen.repository.FuncionarioRepository;
+import org.fen.fen.repository.UsuarioRepository;
 
 import java.util.List;
 import java.util.Locale;

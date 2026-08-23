@@ -1,4 +1,4 @@
-package org.fen.fen.usuario;
+package org.fen.fen.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

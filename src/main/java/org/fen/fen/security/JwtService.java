@@ -4,8 +4,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.Keys;
-import org.fen.fen.usuario.Role;
-import org.fen.fen.usuario.Usuario;
+import org.fen.fen.domain.Role;
+import org.fen.fen.domain.Usuario;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;

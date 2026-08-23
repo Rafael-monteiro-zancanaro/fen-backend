@@ -1,9 +1,10 @@
-package org.fen.fen.usuario;
+package org.fen.fen.controller;
 
 import jakarta.validation.Valid;
-import org.fen.fen.usuario.dto.SupervisorResponse;
-import org.fen.fen.usuario.dto.UsuarioRegisterRequest;
-import org.fen.fen.usuario.dto.UsuarioRegisterResponse;
+import org.fen.fen.service.UsuarioService;
+import org.fen.fen.domain.dto.SupervisorResponse;
+import org.fen.fen.domain.dto.UsuarioRegisterRequest;
+import org.fen.fen.domain.dto.UsuarioRegisterResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

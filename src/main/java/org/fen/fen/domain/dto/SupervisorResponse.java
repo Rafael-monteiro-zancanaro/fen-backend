@@ -1,4 +1,4 @@
-package org.fen.fen.usuario.dto;
+package org.fen.fen.domain.dto;
 
 import java.util.UUID;
 

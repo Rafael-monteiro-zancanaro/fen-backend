@@ -1,8 +1,8 @@
-package org.fen.fen.usuario.dto;
+package org.fen.fen.domain.dto;
 
-import org.fen.fen.usuario.Role;
-import org.fen.fen.usuario.SituacaoUsuario;
-import org.fen.fen.usuario.TipoEstagio;
+import org.fen.fen.domain.Role;
+import org.fen.fen.domain.SituacaoUsuario;
+import org.fen.fen.domain.TipoEstagio;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

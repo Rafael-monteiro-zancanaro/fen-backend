@@ -1,10 +1,14 @@
 package org.fen.fen.usuario;
 
+import org.fen.fen.controller.UsuarioController;
+import org.fen.fen.domain.Role;
+import org.fen.fen.domain.SituacaoUsuario;
 import org.fen.fen.error.ApiExceptionHandler;
 import org.fen.fen.error.BusinessRuleException;
 import org.fen.fen.error.ConflictException;
-import org.fen.fen.usuario.dto.SupervisorResponse;
-import org.fen.fen.usuario.dto.UsuarioRegisterResponse;
+import org.fen.fen.service.UsuarioService;
+import org.fen.fen.domain.dto.SupervisorResponse;
+import org.fen.fen.domain.dto.UsuarioRegisterResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;

@@ -1,4 +1,4 @@
-package org.fen.fen.usuario;
+package org.fen.fen.domain;
 
 public enum TipoEstagio {
     OBRIGATORIO,

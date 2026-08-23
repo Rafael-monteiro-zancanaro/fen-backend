@@ -1,7 +1,8 @@
-package org.fen.fen.usuario;
+package org.fen.fen.controller;
 
-import org.fen.fen.usuario.dto.UsuarioPendenteDetailResponse;
-import org.fen.fen.usuario.dto.UsuarioPendenteSummaryResponse;
+import org.fen.fen.service.UsuarioService;
+import org.fen.fen.domain.dto.UsuarioPendenteDetailResponse;
+import org.fen.fen.domain.dto.UsuarioPendenteSummaryResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;

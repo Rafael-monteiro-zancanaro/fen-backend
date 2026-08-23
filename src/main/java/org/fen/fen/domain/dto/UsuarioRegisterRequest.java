@@ -1,12 +1,12 @@
-package org.fen.fen.usuario.dto;
+package org.fen.fen.domain.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import org.fen.fen.usuario.Role;
-import org.fen.fen.usuario.TipoEstagio;
+import org.fen.fen.domain.Role;
+import org.fen.fen.domain.TipoEstagio;
 import org.fen.fen.validation.Utf8ByteLength;
 
 import java.time.LocalDate;
