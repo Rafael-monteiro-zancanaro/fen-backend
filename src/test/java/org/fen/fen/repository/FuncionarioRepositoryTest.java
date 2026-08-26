@@ -10,6 +10,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.UUID;
+import org.springframework.data.domain.PageRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -75,6 +76,23 @@ class FuncionarioRepositoryTest extends BaseRepositoryTest {
                         org.assertj.core.groups.Tuple.tuple("Farmacêutica Ativa", Role.FARMACEUTICO),
                         org.assertj.core.groups.Tuple.tuple("Zélia Farmacêutica", Role.FARMACEUTICO)
                 );
+    }
+
+    @Test
+    void searchesByNameEmailAndRoleWithPaginationAndLoadedAssociations() {
+        var byName = funcionarioRepository.buscar("farmacêutica", PageRequest.of(0, 1));
+        var byEmail = funcionarioRepository.buscar("farma@fen", PageRequest.of(0, 10));
+        var byRole = funcionarioRepository.buscar("estagiario", PageRequest.of(0, 10));
+
+        assertThat(byName.getTotalElements()).isGreaterThan(1);
+        assertThat(byName.getContent()).singleElement().satisfies(funcionario ->
+                assertThat(funcionario.getUsuario().getEmail()).isNotBlank()
+        );
+        assertThat(byEmail.getContent()).extracting(Funcionario::getNome)
+                .contains("Farmacêutica Ativa");
+        assertThat(byRole.getContent()).allSatisfy(funcionario ->
+                assertThat(funcionario.getUsuario().getRole()).isEqualTo(Role.ESTAGIARIO)
+        );
     }
 
     private Usuario usuario(String email) {

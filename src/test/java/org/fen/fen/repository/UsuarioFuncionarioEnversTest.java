@@ -6,6 +6,8 @@ import org.fen.fen.domain.SituacaoUsuario;
 import org.fen.fen.domain.Usuario;
 import org.fen.fen.mapper.UsuarioMapper;
 import org.fen.fen.service.UsuarioService;
+import org.fen.fen.service.FuncionarioService;
+import org.fen.fen.mapper.FuncionarioMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,6 +17,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.List;
 import java.util.UUID;
@@ -54,6 +59,24 @@ class UsuarioFuncionarioEnversTest extends BaseRepositoryTest {
         assertThat(auditPasswordColumnCount()).isZero();
     }
 
+    @Test
+    void auditsTechnicalResponsibilityWithAuthenticatedAdministrator() {
+        TransactionTemplate transaction = new TransactionTemplate(transactionManager);
+        RegistrationIds ids = transaction.execute(status -> createRegistration());
+        transaction.executeWithoutResult(status -> {
+            SecurityContextHolder.getContext().setAuthentication(
+                    new UsernamePasswordAuthenticationToken("admin@fen.br", "N/A",
+                            List.of(new SimpleGrantedAuthority("ROLE_ADMIN")))
+            );
+            funcionarioService().alterarResponsavelTecnico(ids.funcionarioId(), true);
+            funcionarioRepository.flush();
+        });
+        SecurityContextHolder.clearContext();
+
+        assertThat(jdbcTemplate.queryForObject("select responsaveltecnico from aud.funcionario_aud where id = ? order by rev desc limit 1", Boolean.class, ids.funcionarioId())).isTrue();
+        assertThat(jdbcTemplate.queryForObject("select updatedby from aud.funcionario_aud where id = ? order by rev desc limit 1", String.class, ids.funcionarioId())).isEqualTo("admin@fen.br");
+    }
+
     private RegistrationIds createRegistration() {
         Usuario usuario = new Usuario();
         usuario.setEmail("auditada@fen.br");
@@ -91,6 +114,10 @@ class UsuarioFuncionarioEnversTest extends BaseRepositoryTest {
                 new BCryptPasswordEncoder(),
                 new UsuarioMapper()
         );
+    }
+
+    private FuncionarioService funcionarioService() {
+        return new FuncionarioService(funcionarioRepository, new FuncionarioMapper());
     }
 
     private List<Integer> revisionTypes(String auditTable, UUID id) {
