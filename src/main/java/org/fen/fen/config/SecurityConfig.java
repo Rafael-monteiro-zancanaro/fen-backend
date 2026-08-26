@@ -95,7 +95,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler)
                 )
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login", "/api/recuperacoes-senha").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/public/supervisores").permitAll()
                         .anyRequest().authenticated()
                 )

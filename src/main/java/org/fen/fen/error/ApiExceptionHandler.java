@@ -1,6 +1,7 @@
 package org.fen.fen.error;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
@@ -48,6 +49,11 @@ public class ApiExceptionHandler {
                 exception.getMessage(),
                 Map.of()
         );
+    }
+
+    @ExceptionHandler({IllegalStateException.class, OptimisticLockingFailureException.class})
+    public ResponseEntity<ApiError> handleStateConflict() {
+        return response(HttpStatus.CONFLICT, "CONFLICT", "Recurso foi alterado ou já processado", Map.of());
     }
 
     @ExceptionHandler(NoSuchElementException.class)

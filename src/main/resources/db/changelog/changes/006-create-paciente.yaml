@@ -1,0 +1,70 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-paciente
+      author: codex
+      changes:
+        - createTable:
+            tableName: paciente
+            columns:
+              - column: { name: id, type: uuid, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: nome, type: varchar(150), constraints: { nullable: false } }
+              - column: { name: cpf, type: varchar(11), constraints: { nullable: false } }
+              - column: { name: datanascimento, type: date, constraints: { nullable: false } }
+              - column: { name: celular, type: varchar(11), constraints: { nullable: false } }
+              - column: { name: genero, type: varchar(20) }
+              - column: { name: cep, type: varchar(8) }
+              - column: { name: endereco, type: varchar(254) }
+              - column: { name: bairro, type: varchar(150) }
+              - column: { name: cidade, type: varchar(150) }
+              - column: { name: estado, type: varchar(2) }
+              - column: { name: telefone, type: varchar(11) }
+              - column: { name: nomeresponsavel, type: varchar(150) }
+              - column: { name: createdat, type: timestamp, constraints: { nullable: false } }
+              - column: { name: updatedat, type: timestamp }
+              - column: { name: createdby, type: varchar(255) }
+              - column: { name: updatedby, type: varchar(255) }
+        - addUniqueConstraint: { tableName: paciente, columnNames: cpf, constraintName: uk_paciente_cpf }
+        - createTable:
+            tableName: pacientecomorbidade
+            columns:
+              - column: { name: pacienteid, type: uuid, constraints: { nullable: false } }
+              - column: { name: comorbidadeid, type: uuid, constraints: { nullable: false } }
+        - addPrimaryKey: { tableName: pacientecomorbidade, columnNames: "pacienteid, comorbidadeid", constraintName: pk_pacientecomorbidade }
+        - addForeignKeyConstraint: { baseTableName: pacientecomorbidade, baseColumnNames: pacienteid, referencedTableName: paciente, referencedColumnNames: id, constraintName: fk_pacientecomorbidade_paciente }
+        - addForeignKeyConstraint: { baseTableName: pacientecomorbidade, baseColumnNames: comorbidadeid, referencedTableName: comorbidade, referencedColumnNames: id, constraintName: fk_pacientecomorbidade_comorbidade }
+        - createIndex: { tableName: pacientecomorbidade, indexName: idx_pacientecomorbidade_comorbidade, columns: [{ column: { name: comorbidadeid } }] }
+        - createTable:
+            schemaName: aud
+            tableName: paciente_aud
+            columns:
+              - column: { name: id, type: uuid, constraints: { nullable: false } }
+              - column: { name: rev, type: int, constraints: { nullable: false } }
+              - column: { name: revtype, type: smallint }
+              - column: { name: nome, type: varchar(150) }
+              - column: { name: cpf, type: varchar(11) }
+              - column: { name: datanascimento, type: date }
+              - column: { name: celular, type: varchar(11) }
+              - column: { name: genero, type: varchar(20) }
+              - column: { name: cep, type: varchar(8) }
+              - column: { name: endereco, type: varchar(254) }
+              - column: { name: bairro, type: varchar(150) }
+              - column: { name: cidade, type: varchar(150) }
+              - column: { name: estado, type: varchar(2) }
+              - column: { name: telefone, type: varchar(11) }
+              - column: { name: nomeresponsavel, type: varchar(150) }
+              - column: { name: createdat, type: timestamp }
+              - column: { name: updatedat, type: timestamp }
+              - column: { name: createdby, type: varchar(255) }
+              - column: { name: updatedby, type: varchar(255) }
+        - addPrimaryKey: { schemaName: aud, tableName: paciente_aud, columnNames: "id, rev", constraintName: pk_paciente_aud }
+        - addForeignKeyConstraint: { baseTableSchemaName: aud, baseTableName: paciente_aud, baseColumnNames: rev, referencedTableSchemaName: aud, referencedTableName: revinfo, referencedColumnNames: rev, constraintName: fk_paciente_aud_rev }
+        - createTable:
+            schemaName: aud
+            tableName: pacientecomorbidade_aud
+            columns:
+              - column: { name: rev, type: int, constraints: { nullable: false } }
+              - column: { name: pacienteid, type: uuid, constraints: { nullable: false } }
+              - column: { name: comorbidadeid, type: uuid, constraints: { nullable: false } }
+              - column: { name: revtype, type: smallint }
+        - addPrimaryKey: { schemaName: aud, tableName: pacientecomorbidade_aud, columnNames: "rev, pacienteid, comorbidadeid", constraintName: pk_pacientecomorbidade_aud }
+        - addForeignKeyConstraint: { baseTableSchemaName: aud, baseTableName: pacientecomorbidade_aud, baseColumnNames: rev, referencedTableSchemaName: aud, referencedTableName: revinfo, referencedColumnNames: rev, constraintName: fk_pacientecomorbidade_aud_rev }

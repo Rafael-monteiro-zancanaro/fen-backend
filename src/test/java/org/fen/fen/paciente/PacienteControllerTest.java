@@ -1,0 +1,4 @@
+package org.fen.fen.paciente;
+import org.fen.fen.controller.PacienteController; import org.fen.fen.error.ApiExceptionHandler; import org.fen.fen.service.PacienteService; import org.junit.jupiter.api.*; import org.springframework.test.web.servlet.*; import org.springframework.test.web.servlet.setup.MockMvcBuilders; import static org.mockito.Mockito.*; import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*; import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+class PacienteControllerTest { MockMvc mvc; @BeforeEach void setup(){mvc=MockMvcBuilders.standaloneSetup(new PacienteController(mock(PacienteService.class))).setControllerAdvice(new ApiExceptionHandler()).build();}
+@Test void rejeitaCadastroSemCamposObrigatorios()throws Exception{mvc.perform(post("/api/pacientes").contentType("application/json").content("{}")).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));}}
