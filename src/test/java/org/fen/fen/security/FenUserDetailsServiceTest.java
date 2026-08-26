@@ -1,9 +1,9 @@
 package org.fen.fen.security;
 
-import org.fen.fen.usuario.Role;
-import org.fen.fen.usuario.SituacaoUsuario;
-import org.fen.fen.usuario.Usuario;
-import org.fen.fen.usuario.UsuarioRepository;
+import org.fen.fen.domain.Role;
+import org.fen.fen.domain.SituacaoUsuario;
+import org.fen.fen.domain.Usuario;
+import org.fen.fen.repository.UsuarioRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.userdetails.UserDetails;
 

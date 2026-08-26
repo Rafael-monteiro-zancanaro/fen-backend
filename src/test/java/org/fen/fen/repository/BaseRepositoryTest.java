@@ -15,7 +15,7 @@ import org.springframework.test.context.DynamicPropertySource;
 @ContextConfiguration(initializers = {})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(AuditingConfig.class)
-@Tag("repository")
+@Tag("org/fen/fen/repository")
 public class BaseRepositoryTest {
 
     @DynamicPropertySource

@@ -1,9 +1,14 @@
 package org.fen.fen.usuario;
 
+import org.fen.fen.controller.AdminUsuarioController;
+import org.fen.fen.domain.Role;
+import org.fen.fen.domain.SituacaoUsuario;
+import org.fen.fen.domain.TipoEstagio;
 import org.fen.fen.error.ApiExceptionHandler;
-import org.fen.fen.usuario.dto.SupervisorResponse;
-import org.fen.fen.usuario.dto.UsuarioPendenteDetailResponse;
-import org.fen.fen.usuario.dto.UsuarioPendenteSummaryResponse;
+import org.fen.fen.service.UsuarioService;
+import org.fen.fen.domain.dto.SupervisorResponse;
+import org.fen.fen.domain.dto.UsuarioPendenteDetailResponse;
+import org.fen.fen.domain.dto.UsuarioPendenteSummaryResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;

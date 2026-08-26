@@ -1,11 +1,9 @@
 package org.fen.fen.repository;
 
-import org.fen.fen.usuario.Funcionario;
-import org.fen.fen.usuario.FuncionarioRepository;
-import org.fen.fen.usuario.Role;
-import org.fen.fen.usuario.SituacaoUsuario;
-import org.fen.fen.usuario.Usuario;
-import org.fen.fen.usuario.UsuarioRepository;
+import org.fen.fen.domain.Funcionario;
+import org.fen.fen.domain.Role;
+import org.fen.fen.domain.SituacaoUsuario;
+import org.fen.fen.domain.Usuario;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;

@@ -1,10 +1,8 @@
 package org.fen.fen.repository;
 
 import jakarta.persistence.EntityManagerFactory;
-import org.fen.fen.usuario.FuncionarioRepository;
-import org.fen.fen.usuario.UsuarioMapper;
-import org.fen.fen.usuario.UsuarioRepository;
-import org.fen.fen.usuario.UsuarioService;
+import org.fen.fen.mapper.UsuarioMapper;
+import org.fen.fen.service.UsuarioService;
 import org.hibernate.SessionFactory;
 import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.Test;

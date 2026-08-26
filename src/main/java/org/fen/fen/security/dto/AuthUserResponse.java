@@ -1,6 +1,6 @@
 package org.fen.fen.security.dto;
 
-import org.fen.fen.usuario.Role;
+import org.fen.fen.domain.Role;
 
 import java.util.UUID;
 

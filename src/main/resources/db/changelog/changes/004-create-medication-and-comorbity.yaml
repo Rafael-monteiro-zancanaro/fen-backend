@@ -1,0 +1,111 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-medicamento-comorbidade-interacao
+      author: rafael.zancanaro
+      changes:
+        - createTable:
+            tableName: medicamento
+            columns:
+              - column: { name: id, type: uuid, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: nome, type: varchar(254), constraints: { nullable: false } }
+              - column: { name: unidademedida, type: varchar(254), constraints: { nullable: false } }
+              - column: { name: viaadministracao, type: varchar(254), constraints: { nullable: false } }
+              - column: { name: createdat, type: timestamp, constraints: { nullable: false } }
+              - column: { name: updatedat, type: timestamp }
+              - column: { name: createdby, type: varchar(255) }
+              - column: { name: updatedby, type: varchar(255) }
+        - createIndex:
+            tableName: medicamento
+            indexName: idx_medicamento_nome
+            columns:
+              - column: { name: nome }
+        - createTable:
+            tableName: comorbidade
+            columns:
+              - column: { name: id, type: uuid, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: nome, type: varchar(254), constraints: { nullable: false } }
+              - column: { name: createdat, type: timestamp, constraints: { nullable: false } }
+              - column: { name: updatedat, type: timestamp }
+              - column: { name: createdby, type: varchar(255) }
+              - column: { name: updatedby, type: varchar(255) }
+        - createIndex:
+            tableName: comorbidade
+            indexName: idx_comorbidade_nome
+            columns:
+              - column: { name: nome }
+        - createTable:
+            tableName: interacao
+            columns:
+              - column: { name: id, type: uuid, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: comorbidadeid, type: uuid, constraints: { nullable: false } }
+              - column: { name: medicamentoid, type: uuid, constraints: { nullable: false } }
+              - column: { name: createdat, type: timestamp, constraints: { nullable: false } }
+              - column: { name: updatedat, type: timestamp }
+              - column: { name: createdby, type: varchar(255) }
+              - column: { name: updatedby, type: varchar(255) }
+        - addForeignKeyConstraint:
+            baseTableName: interacao
+            baseColumnNames: comorbidadeid
+            referencedTableName: comorbidade
+            referencedColumnNames: id
+            constraintName: fk_interacao_comorbidade
+        - addForeignKeyConstraint:
+            baseTableName: interacao
+            baseColumnNames: medicamentoid
+            referencedTableName: medicamento
+            referencedColumnNames: id
+            constraintName: fk_interacao_medicamento
+        - addUniqueConstraint:
+            tableName: interacao
+            columnNames: comorbidadeid, medicamentoid
+            constraintName: uk_interacao_comorbidade_medicamento
+        - createIndex:
+            tableName: interacao
+            indexName: idx_interacao_medicamento
+            columns:
+              - column: { name: medicamentoid }
+        - createTable:
+            schemaName: aud
+            tableName: medicamento_aud
+            columns:
+              - column: { name: id, type: uuid, constraints: { nullable: false } }
+              - column: { name: rev, type: int, constraints: { nullable: false } }
+              - column: { name: revtype, type: smallint }
+              - column: { name: nome, type: varchar(254) }
+              - column: { name: unidademedida, type: varchar(254) }
+              - column: { name: viaadministracao, type: varchar(254) }
+              - column: { name: createdat, type: timestamp }
+              - column: { name: updatedat, type: timestamp }
+              - column: { name: createdby, type: varchar(255) }
+              - column: { name: updatedby, type: varchar(255) }
+        - addPrimaryKey: { schemaName: aud, tableName: medicamento_aud, columnNames: "id, rev", constraintName: pk_medicamento_aud }
+        - addForeignKeyConstraint: { baseTableSchemaName: aud, baseTableName: medicamento_aud, baseColumnNames: rev, referencedTableSchemaName: aud, referencedTableName: revinfo, referencedColumnNames: rev, constraintName: fk_medicamento_aud_rev }
+        - createTable:
+            schemaName: aud
+            tableName: comorbidade_aud
+            columns:
+              - column: { name: id, type: uuid, constraints: { nullable: false } }
+              - column: { name: rev, type: int, constraints: { nullable: false } }
+              - column: { name: revtype, type: smallint }
+              - column: { name: nome, type: varchar(254) }
+              - column: { name: createdat, type: timestamp }
+              - column: { name: updatedat, type: timestamp }
+              - column: { name: createdby, type: varchar(255) }
+              - column: { name: updatedby, type: varchar(255) }
+        - addPrimaryKey: { schemaName: aud, tableName: comorbidade_aud, columnNames: "id, rev", constraintName: pk_comorbidade_aud }
+        - addForeignKeyConstraint: { baseTableSchemaName: aud, baseTableName: comorbidade_aud, baseColumnNames: rev, referencedTableSchemaName: aud, referencedTableName: revinfo, referencedColumnNames: rev, constraintName: fk_comorbidade_aud_rev }
+        - createTable:
+            schemaName: aud
+            tableName: interacao_aud
+            columns:
+              - column: { name: id, type: uuid, constraints: { nullable: false } }
+              - column: { name: rev, type: int, constraints: { nullable: false } }
+              - column: { name: revtype, type: smallint }
+              - column: { name: comorbidadeid, type: uuid }
+              - column: { name: medicamentoid, type: uuid }
+              - column: { name: createdat, type: timestamp }
+              - column: { name: updatedat, type: timestamp }
+              - column: { name: createdby, type: varchar(255) }
+              - column: { name: updatedby, type: varchar(255) }
+        - addPrimaryKey: { schemaName: aud, tableName: interacao_aud, columnNames: "id, rev", constraintName: pk_interacao_aud }
+        - addForeignKeyConstraint: { baseTableSchemaName: aud, baseTableName: interacao_aud, baseColumnNames: rev, referencedTableSchemaName: aud, referencedTableName: revinfo, referencedColumnNames: rev, constraintName: fk_interacao_aud_rev }

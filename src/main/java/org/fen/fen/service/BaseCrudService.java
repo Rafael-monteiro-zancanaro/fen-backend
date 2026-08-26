@@ -20,6 +20,8 @@ public abstract class BaseCrudService<T extends WithSynteticId> {
         return repository.findAll(pageable);
     }
 
+    public T findById(UUID id) throws ClassNotFoundException { return repository.findById(id).orElseThrow(ClassNotFoundException::new); };
+
     public T save(T entity) {
         return repository.save(entity);
     }

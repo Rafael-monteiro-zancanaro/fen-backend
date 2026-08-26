@@ -2,8 +2,8 @@ package org.fen.fen.security;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
-import org.fen.fen.usuario.Role;
-import org.fen.fen.usuario.Usuario;
+import org.fen.fen.domain.Role;
+import org.fen.fen.domain.Usuario;
 import org.junit.jupiter.api.Test;
 
 import java.time.Clock;

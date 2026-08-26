@@ -3,7 +3,7 @@ package org.fen.fen.security;
 import org.fen.fen.security.dto.AuthUserResponse;
 import org.fen.fen.security.dto.LoginRequest;
 import org.fen.fen.security.dto.LoginResponse;
-import org.fen.fen.usuario.Role;
+import org.fen.fen.domain.Role;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.security.authentication.AuthenticationManager;
