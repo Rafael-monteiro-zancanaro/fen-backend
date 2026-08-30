@@ -23,6 +23,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,6 +32,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 )
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class UsuarioFuncionarioEnversTest extends BaseRepositoryTest {
+
+    private static final AtomicLong REGISTRATION_SEQUENCE = new AtomicLong();
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -78,8 +81,9 @@ class UsuarioFuncionarioEnversTest extends BaseRepositoryTest {
     }
 
     private RegistrationIds createRegistration() {
+        long sequence = REGISTRATION_SEQUENCE.incrementAndGet();
         Usuario usuario = new Usuario();
-        usuario.setEmail("auditada@fen.br");
+        usuario.setEmail("auditada." + sequence + "@fen.br");
         usuario.setPasswordHash("verifier-create");
         usuario.setRole(Role.FARMACEUTICO);
         usuario.setSituacao(SituacaoUsuario.PENDENTE);
@@ -88,7 +92,7 @@ class UsuarioFuncionarioEnversTest extends BaseRepositoryTest {
         Funcionario funcionario = new Funcionario();
         funcionario.setUsuario(usuario);
         funcionario.setNome("Funcionária Auditada");
-        funcionario.setCpf("88888888888");
+        funcionario.setCpf(String.format("%011d", sequence));
         funcionario.setCrf("PR-88888");
         funcionario.setResponsavelTecnico(false);
         funcionarioRepository.saveAndFlush(funcionario);

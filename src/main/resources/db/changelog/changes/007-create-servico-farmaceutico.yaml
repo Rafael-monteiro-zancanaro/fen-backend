@@ -1,0 +1,154 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-servico-farmaceutico
+      author: codex
+      changes:
+        - createSequence: { sequenceName: servicofarmaceutico_codigo_seq, startValue: 1001, incrementBy: 1 }
+        - createTable:
+            tableName: servicofarmaceutico
+            columns:
+              - column: { name: id, type: uuid, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: codigo, type: bigint, constraints: { nullable: false } }
+              - column: { name: pacienteid, type: uuid, constraints: { nullable: false } }
+              - column: { name: dataatendimento, type: date, constraints: { nullable: false } }
+              - column: { name: statuspersistido, type: varchar(30), constraints: { nullable: false } }
+              - column: { name: acompanhamentoid, type: uuid }
+              - column: { name: atendimentoanteriorid, type: uuid }
+              - column: { name: numeroretorno, type: int, constraints: { nullable: false } }
+              - column: { name: glicemiacapilar, type: 'decimal(10,2)' }
+              - column: { name: pressaosistolica, type: 'decimal(10,2)' }
+              - column: { name: pressaodiastolica, type: 'decimal(10,2)' }
+              - column: { name: temperaturacorporal, type: 'decimal(5,2)' }
+              - column: { name: viainjetavel, type: varchar(80) }
+              - column: { name: prescritorinjetavel, type: varchar(150) }
+              - column: { name: crmcrinjetavel, type: varchar(80) }
+              - column: { name: prescritorinaloterapia, type: varchar(150) }
+              - column: { name: crmcrinaloterapia, type: varchar(80) }
+              - column: { name: assistenciadomiciliar, type: boolean }
+              - column: { name: acompanhamentofarmacoterapeutico, type: boolean }
+              - column: { name: indicacaotranstornosmenores, type: boolean }
+              - column: { name: sinaisesintomas, type: varchar(4000) }
+              - column: { name: numeroficha, type: varchar(80) }
+              - column: { name: dataservicofarmaceutico, type: date }
+              - column: { name: createdat, type: timestamp, constraints: { nullable: false } }
+              - column: { name: updatedat, type: timestamp }
+              - column: { name: createdby, type: varchar(255) }
+              - column: { name: updatedby, type: varchar(255) }
+        - createTable:
+            tableName: acompanhamento
+            columns:
+              - column: { name: id, type: uuid, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: atendimentoinicialid, type: uuid, constraints: { nullable: false } }
+              - column: { name: atendimentoatualid, type: uuid, constraints: { nullable: false } }
+              - column: { name: intervaloretornodias, type: int, constraints: { nullable: false } }
+              - column: { name: quantidaderetornos, type: int, constraints: { nullable: false } }
+              - column: { name: proximoretorno, type: date }
+              - column: { name: encerradoem, type: date }
+              - column: { name: version, type: bigint, constraints: { nullable: false } }
+              - column: { name: createdat, type: timestamp, constraints: { nullable: false } }
+              - column: { name: updatedat, type: timestamp }
+              - column: { name: createdby, type: varchar(255) }
+              - column: { name: updatedby, type: varchar(255) }
+        - createTable:
+            tableName: medicamentoatendimento
+            columns:
+              - column: { name: id, type: uuid, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: servicofarmaceuticoid, type: uuid, constraints: { nullable: false } }
+              - column: { name: medicamentoid, type: uuid, constraints: { nullable: false } }
+              - column: { name: tiposervico, type: varchar(40), constraints: { nullable: false } }
+              - column: { name: lote, type: varchar(100), constraints: { nullable: false } }
+              - column: { name: validade, type: date, constraints: { nullable: false } }
+              - column: { name: posologia, type: varchar(500), constraints: { nullable: false } }
+              - column: { name: viaadministracao, type: varchar(80) }
+              - column: { name: createdat, type: timestamp, constraints: { nullable: false } }
+              - column: { name: updatedat, type: timestamp }
+              - column: { name: createdby, type: varchar(255) }
+              - column: { name: updatedby, type: varchar(255) }
+        - addUniqueConstraint: { tableName: servicofarmaceutico, columnNames: codigo, constraintName: uk_servicofarmaceutico_codigo }
+        - addUniqueConstraint: { tableName: servicofarmaceutico, columnNames: "acompanhamentoid, numeroretorno", constraintName: uk_servicofarmaceutico_acompanhamento_retorno }
+        - addUniqueConstraint: { tableName: acompanhamento, columnNames: atendimentoinicialid, constraintName: uk_acompanhamento_inicial }
+        - addUniqueConstraint: { tableName: acompanhamento, columnNames: atendimentoatualid, constraintName: uk_acompanhamento_atual }
+        - addForeignKeyConstraint: { baseTableName: servicofarmaceutico, baseColumnNames: pacienteid, referencedTableName: paciente, referencedColumnNames: id, constraintName: fk_servicofarmaceutico_paciente }
+        - addForeignKeyConstraint: { baseTableName: servicofarmaceutico, baseColumnNames: acompanhamentoid, referencedTableName: acompanhamento, referencedColumnNames: id, constraintName: fk_servicofarmaceutico_acompanhamento }
+        - addForeignKeyConstraint: { baseTableName: servicofarmaceutico, baseColumnNames: atendimentoanteriorid, referencedTableName: servicofarmaceutico, referencedColumnNames: id, constraintName: fk_servicofarmaceutico_anterior }
+        - addForeignKeyConstraint: { baseTableName: acompanhamento, baseColumnNames: atendimentoinicialid, referencedTableName: servicofarmaceutico, referencedColumnNames: id, constraintName: fk_acompanhamento_inicial }
+        - addForeignKeyConstraint: { baseTableName: acompanhamento, baseColumnNames: atendimentoatualid, referencedTableName: servicofarmaceutico, referencedColumnNames: id, constraintName: fk_acompanhamento_atual }
+        - addForeignKeyConstraint: { baseTableName: medicamentoatendimento, baseColumnNames: servicofarmaceuticoid, referencedTableName: servicofarmaceutico, referencedColumnNames: id, constraintName: fk_medicamentoatendimento_servico }
+        - addForeignKeyConstraint: { baseTableName: medicamentoatendimento, baseColumnNames: medicamentoid, referencedTableName: medicamento, referencedColumnNames: id, constraintName: fk_medicamentoatendimento_medicamento }
+        - createIndex: { tableName: servicofarmaceutico, indexName: idx_servicofarmaceutico_paciente_data, columns: [{ column: { name: pacienteid } }, { column: { name: dataatendimento } }] }
+        - createIndex: { tableName: servicofarmaceutico, indexName: idx_servicofarmaceutico_status, columns: [{ column: { name: statuspersistido } }] }
+        - createIndex: { tableName: medicamentoatendimento, indexName: idx_medicamentoatendimento_medicamento_lote, columns: [{ column: { name: medicamentoid } }, { column: { name: lote } }] }
+        - createTable:
+            schemaName: aud
+            tableName: servicofarmaceutico_aud
+            columns:
+              - column: { name: id, type: uuid, constraints: { nullable: false } }
+              - column: { name: rev, type: int, constraints: { nullable: false } }
+              - column: { name: revtype, type: smallint }
+              - column: { name: codigo, type: bigint }
+              - column: { name: pacienteid, type: uuid }
+              - column: { name: dataatendimento, type: date }
+              - column: { name: statuspersistido, type: varchar(30) }
+              - column: { name: acompanhamentoid, type: uuid }
+              - column: { name: atendimentoanteriorid, type: uuid }
+              - column: { name: numeroretorno, type: int }
+              - column: { name: glicemiacapilar, type: 'decimal(10,2)' }
+              - column: { name: pressaosistolica, type: 'decimal(10,2)' }
+              - column: { name: pressaodiastolica, type: 'decimal(10,2)' }
+              - column: { name: temperaturacorporal, type: 'decimal(5,2)' }
+              - column: { name: viainjetavel, type: varchar(80) }
+              - column: { name: prescritorinjetavel, type: varchar(150) }
+              - column: { name: crmcrinjetavel, type: varchar(80) }
+              - column: { name: prescritorinaloterapia, type: varchar(150) }
+              - column: { name: crmcrinaloterapia, type: varchar(80) }
+              - column: { name: assistenciadomiciliar, type: boolean }
+              - column: { name: acompanhamentofarmacoterapeutico, type: boolean }
+              - column: { name: indicacaotranstornosmenores, type: boolean }
+              - column: { name: sinaisesintomas, type: varchar(4000) }
+              - column: { name: numeroficha, type: varchar(80) }
+              - column: { name: dataservicofarmaceutico, type: date }
+              - column: { name: createdat, type: timestamp }
+              - column: { name: updatedat, type: timestamp }
+              - column: { name: createdby, type: varchar(255) }
+              - column: { name: updatedby, type: varchar(255) }
+        - addPrimaryKey: { schemaName: aud, tableName: servicofarmaceutico_aud, columnNames: "id, rev", constraintName: pk_servicofarmaceutico_aud }
+        - addForeignKeyConstraint: { baseTableSchemaName: aud, baseTableName: servicofarmaceutico_aud, baseColumnNames: rev, referencedTableSchemaName: aud, referencedTableName: revinfo, referencedColumnNames: rev, constraintName: fk_servicofarmaceutico_aud_rev }
+        - createTable:
+            schemaName: aud
+            tableName: acompanhamento_aud
+            columns:
+              - column: { name: id, type: uuid, constraints: { nullable: false } }
+              - column: { name: rev, type: int, constraints: { nullable: false } }
+              - column: { name: revtype, type: smallint }
+              - column: { name: atendimentoinicialid, type: uuid }
+              - column: { name: atendimentoatualid, type: uuid }
+              - column: { name: intervaloretornodias, type: int }
+              - column: { name: quantidaderetornos, type: int }
+              - column: { name: proximoretorno, type: date }
+              - column: { name: encerradoem, type: date }
+              - column: { name: createdat, type: timestamp }
+              - column: { name: updatedat, type: timestamp }
+              - column: { name: createdby, type: varchar(255) }
+              - column: { name: updatedby, type: varchar(255) }
+        - addPrimaryKey: { schemaName: aud, tableName: acompanhamento_aud, columnNames: "id, rev", constraintName: pk_acompanhamento_aud }
+        - addForeignKeyConstraint: { baseTableSchemaName: aud, baseTableName: acompanhamento_aud, baseColumnNames: rev, referencedTableSchemaName: aud, referencedTableName: revinfo, referencedColumnNames: rev, constraintName: fk_acompanhamento_aud_rev }
+        - createTable:
+            schemaName: aud
+            tableName: medicamentoatendimento_aud
+            columns:
+              - column: { name: id, type: uuid, constraints: { nullable: false } }
+              - column: { name: rev, type: int, constraints: { nullable: false } }
+              - column: { name: revtype, type: smallint }
+              - column: { name: servicofarmaceuticoid, type: uuid }
+              - column: { name: medicamentoid, type: uuid }
+              - column: { name: tiposervico, type: varchar(40) }
+              - column: { name: lote, type: varchar(100) }
+              - column: { name: validade, type: date }
+              - column: { name: posologia, type: varchar(500) }
+              - column: { name: viaadministracao, type: varchar(80) }
+              - column: { name: createdat, type: timestamp }
+              - column: { name: updatedat, type: timestamp }
+              - column: { name: createdby, type: varchar(255) }
+              - column: { name: updatedby, type: varchar(255) }
+        - addPrimaryKey: { schemaName: aud, tableName: medicamentoatendimento_aud, columnNames: "id, rev", constraintName: pk_medicamentoatendimento_aud }
+        - addForeignKeyConstraint: { baseTableSchemaName: aud, baseTableName: medicamentoatendimento_aud, baseColumnNames: rev, referencedTableSchemaName: aud, referencedTableName: revinfo, referencedColumnNames: rev, constraintName: fk_medicamentoatendimento_aud_rev }

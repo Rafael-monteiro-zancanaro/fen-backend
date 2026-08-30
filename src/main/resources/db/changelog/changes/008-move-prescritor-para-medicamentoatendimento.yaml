@@ -1,0 +1,58 @@
+databaseChangeLog:
+  - changeSet:
+      id: move-prescritor-para-medicamentoatendimento
+      author: codex
+      changes:
+        - addColumn:
+            tableName: medicamentoatendimento
+            columns:
+              - column: { name: nomeprescritor, type: varchar(150) }
+              - column: { name: registroprescritor, type: varchar(80) }
+        - sql:
+            sql: >-
+              UPDATE medicamentoatendimento
+              SET nomeprescritor = (
+                SELECT prescritorinjetavel
+                FROM servicofarmaceutico
+                WHERE servicofarmaceutico.id = medicamentoatendimento.servicofarmaceuticoid
+              ), registroprescritor = (
+                SELECT crmcrinjetavel
+                FROM servicofarmaceutico
+                WHERE servicofarmaceutico.id = medicamentoatendimento.servicofarmaceuticoid
+              )
+              WHERE tiposervico = 'APLICACAO_INJETAVEIS'
+        - sql:
+            sql: >-
+              UPDATE medicamentoatendimento
+              SET nomeprescritor = (
+                SELECT prescritorinaloterapia
+                FROM servicofarmaceutico
+                WHERE servicofarmaceutico.id = medicamentoatendimento.servicofarmaceuticoid
+              ), registroprescritor = (
+                SELECT crmcrinaloterapia
+                FROM servicofarmaceutico
+                WHERE servicofarmaceutico.id = medicamentoatendimento.servicofarmaceuticoid
+              )
+              WHERE tiposervico = 'INALOTERAPIA'
+        - addColumn:
+            schemaName: aud
+            tableName: medicamentoatendimento_aud
+            columns:
+              - column: { name: nomeprescritor, type: varchar(150) }
+              - column: { name: registroprescritor, type: varchar(80) }
+        - dropColumn: { tableName: medicamentoatendimento, columnName: viaadministracao }
+        - dropColumn: { schemaName: aud, tableName: medicamentoatendimento_aud, columnName: viaadministracao }
+        - dropColumn: { tableName: servicofarmaceutico, columnName: viainjetavel }
+        - dropColumn: { tableName: servicofarmaceutico, columnName: prescritorinjetavel }
+        - dropColumn: { tableName: servicofarmaceutico, columnName: crmcrinjetavel }
+        - dropColumn: { tableName: servicofarmaceutico, columnName: prescritorinaloterapia }
+        - dropColumn: { tableName: servicofarmaceutico, columnName: crmcrinaloterapia }
+        - dropColumn: { tableName: servicofarmaceutico, columnName: numeroficha }
+        - dropColumn: { tableName: servicofarmaceutico, columnName: dataservicofarmaceutico }
+        - dropColumn: { schemaName: aud, tableName: servicofarmaceutico_aud, columnName: viainjetavel }
+        - dropColumn: { schemaName: aud, tableName: servicofarmaceutico_aud, columnName: prescritorinjetavel }
+        - dropColumn: { schemaName: aud, tableName: servicofarmaceutico_aud, columnName: crmcrinjetavel }
+        - dropColumn: { schemaName: aud, tableName: servicofarmaceutico_aud, columnName: prescritorinaloterapia }
+        - dropColumn: { schemaName: aud, tableName: servicofarmaceutico_aud, columnName: crmcrinaloterapia }
+        - dropColumn: { schemaName: aud, tableName: servicofarmaceutico_aud, columnName: numeroficha }
+        - dropColumn: { schemaName: aud, tableName: servicofarmaceutico_aud, columnName: dataservicofarmaceutico }
