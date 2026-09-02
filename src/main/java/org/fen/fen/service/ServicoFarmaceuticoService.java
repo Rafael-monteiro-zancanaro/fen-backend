@@ -76,11 +76,21 @@ public class ServicoFarmaceuticoService {
 
     @Transactional(readOnly = true)
     public Page<ServicoFarmaceuticoResumoResponse> listar(String query, String status, Pageable pageable) {
+        return listar(query, status, false, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ServicoFarmaceuticoResumoResponse> listar(
+            String query,
+            String status,
+            boolean retornoHoje,
+            Pageable pageable
+    ) {
         String termo = query == null ? "" : query.trim();
         String digitos = termo.replaceAll("\\D", "");
         String filtro = status == null || status.equals("TODOS") ? "" : status;
 
-        return repository.listar(termo, digitos, filtro, LocalDate.now(clock), pageable)
+        return repository.listar(termo, digitos, filtro, retornoHoje, LocalDate.now(clock), pageable)
                 .map(this::resumo);
     }
 

@@ -49,9 +49,10 @@ public class ServicoFarmaceuticoController {
     public Page<ServicoFarmaceuticoResumoResponse> listar(
             @RequestParam(defaultValue = "") String query,
             @RequestParam(defaultValue = "") String status,
+            @RequestParam(defaultValue = "false") boolean retornoHoje,
             @PageableDefault(size = 10) Pageable pageable
     ) {
-        return service.listar(query, status, pageable);
+        return service.listar(query, status, retornoHoje, pageable);
     }
 
     @GetMapping("/busca-avancada")
