@@ -222,7 +222,7 @@ Teste um chip removível que retira `retornoHoje` da URL e o parâmetro HTTP env
 
 - [ ] **Step 3: Executar RED**
 
-Run: `yarn test --run src/app/domain/dashboard.service.spec.ts src/app/app.spec.ts`
+Run: `yarn test --watch=false --include src/app/domain/dashboard.service.spec.ts --include src/app/app.spec.ts`
 
 Expected: FAIL por service, assinatura e estado de URL ausentes.
 
@@ -236,7 +236,7 @@ Somente enviar `retornoHoje=true` quando o filtro estiver ativo. A listagem atua
 
 - [ ] **Step 5: Executar GREEN**
 
-Run: `yarn test --run src/app/domain/dashboard.service.spec.ts src/app/app.spec.ts`
+Run: `yarn test --watch=false --include src/app/domain/dashboard.service.spec.ts --include src/app/app.spec.ts`
 
 Expected: PASS e a UI informa claramente que o filtro de hoje está ativo.
 
@@ -270,7 +270,7 @@ Inclua loading sem números, erro com botão de tentar novamente, zero após res
 
 - [ ] **Step 2: Executar RED**
 
-Run: `yarn test --run src/app/app.spec.ts`
+Run: `yarn test --watch=false --include src/app/app.spec.ts`
 
 Expected: FAIL porque a página ainda tem métricas e séries estáticas.
 
@@ -286,7 +286,7 @@ Usar `button` para cards, `Router.navigate` para `/atendimentos`, classes `card`
 
 - [ ] **Step 4: Executar GREEN e build**
 
-Run: `yarn test --run src/app/app.spec.ts && yarn build`
+Run: `yarn test --watch=false --include src/app/app.spec.ts && yarn build`
 
 Expected: PASS e build de produção concluído sem nova dependência.
 
@@ -310,7 +310,7 @@ Expected: PASS.
 
 - [ ] **Step 2: Executar a suíte e build frontend**
 
-Run: `yarn test --run && yarn build`
+Run: `yarn test --watch=false && yarn build`
 
 Expected: PASS.
 
