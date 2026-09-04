@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FuncionarioMapper {
     public FuncionarioSummaryResponse toSummary(Funcionario f) {
-        return new FuncionarioSummaryResponse(f.getId(), f.getNome(), f.getUsuario().getEmail(),
+        return new FuncionarioSummaryResponse(f.getId(), f.getUsuario().getId(), f.getNome(), f.getUsuario().getEmail(),
                 f.getUsuario().getRole(), f.getUsuario().getSituacao(), f.getResponsavelTecnico());
     }
     public FuncionarioDetailResponse toDetail(Funcionario f) {

@@ -35,7 +35,7 @@ public class UsuarioMapper {
         funcionario.setDataNascimento(request.dataNascimento());
         if (request.role() == Role.FARMACEUTICO) {
             funcionario.setCrf(request.crf().trim());
-            funcionario.setResponsavelTecnico(request.responsavelTecnico());
+            funcionario.setResponsavelTecnico(false);
         } else {
             funcionario.setTipoEstagio(request.tipoEstagio());
             funcionario.setSupervisor(supervisor);

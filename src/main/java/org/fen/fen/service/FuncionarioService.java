@@ -4,6 +4,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import org.fen.fen.domain.Funcionario;
 import org.fen.fen.domain.Role;
+import org.fen.fen.domain.SituacaoUsuario;
 import org.fen.fen.domain.dto.FuncionarioDetailResponse;
 import org.fen.fen.domain.dto.FuncionarioSummaryResponse;
 import org.fen.fen.error.BusinessRuleException;
@@ -38,6 +39,9 @@ public class FuncionarioService {
     @Transactional
     public FuncionarioDetailResponse alterarResponsavelTecnico(UUID id, boolean responsavelTecnico) {
         Funcionario funcionario = find(id);
+        if (funcionario.getUsuario().getSituacao() != SituacaoUsuario.ATIVO) {
+            throw new BusinessRuleException("Funcionário ainda não foi efetivado");
+        }
         if (funcionario.getUsuario().getRole() == Role.ESTAGIARIO
                 || funcionario.getCrf() == null || funcionario.getCrf().isBlank()) {
             throw new BusinessRuleException("Funcionário não é farmacêutico");

@@ -75,7 +75,6 @@ class AdminSeedResourceITTest {
                 REGISTRATION_PASSWORD,
                 Role.FARMACEUTICO,
                 "PR-12345",
-                false,
                 null,
                 null,
                 null,

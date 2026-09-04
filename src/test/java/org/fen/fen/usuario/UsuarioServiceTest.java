@@ -89,7 +89,7 @@ class UsuarioServiceTest {
         assertThat(savedFuncionario.getNome()).isEqualTo("Nova Farmacêutica");
         assertThat(savedFuncionario.getCpf()).isEqualTo("12345678901");
         assertThat(savedFuncionario.getCrf()).isEqualTo("PR-12345");
-        assertThat(savedFuncionario.getResponsavelTecnico()).isTrue();
+        assertThat(savedFuncionario.getResponsavelTecnico()).isFalse();
         assertThat(response.usuarioId()).isEqualTo(USUARIO_ID);
         assertThat(response.funcionarioId()).isEqualTo(FUNCIONARIO_ID);
         assertThat(response.situacao()).isEqualTo(SituacaoUsuario.PENDENTE);
@@ -136,30 +136,8 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void requiresTechnicalManagerChoiceForPharmacist() {
-        UsuarioRegisterRequest valid = pharmacistRequest();
-        UsuarioRegisterRequest request = new UsuarioRegisterRequest(
-                valid.nome(), valid.cpf(), valid.dataNascimento(), valid.email(), valid.senha(), valid.role(),
-                valid.crf(), null, valid.tipoEstagio(), valid.supervisorId(),
-                valid.inicioVigencia(), valid.fimVigencia()
-        );
-
-        assertThatThrownBy(() -> usuarioService.register(request))
-                .isInstanceOf(BusinessRuleException.class);
-        assertThat(savedUsuario).isNull();
-        assertThat(savedFuncionario).isNull();
-    }
-
-    @Test
-    void acceptsExplicitFalseTechnicalManagerChoiceForPharmacist() {
-        UsuarioRegisterRequest valid = pharmacistRequest();
-        UsuarioRegisterRequest request = new UsuarioRegisterRequest(
-                valid.nome(), valid.cpf(), valid.dataNascimento(), valid.email(), valid.senha(), valid.role(),
-                valid.crf(), false, valid.tipoEstagio(), valid.supervisorId(),
-                valid.inicioVigencia(), valid.fimVigencia()
-        );
-
-        usuarioService.register(request);
+    void publicPharmacistRegistrationNeverSetsTechnicalResponsibility() {
+        usuarioService.register(pharmacistRequest());
 
         assertThat(savedFuncionario.getResponsavelTecnico()).isFalse();
     }
@@ -188,7 +166,7 @@ class UsuarioServiceTest {
         );
         UsuarioRegisterRequest request = new UsuarioRegisterRequest(
                 valid.nome(), valid.cpf(), valid.dataNascimento(), valid.email(), valid.senha(), valid.role(),
-                valid.crf(), valid.responsavelTecnico(), null, valid.supervisorId(),
+                valid.crf(), null, valid.supervisorId(),
                 valid.inicioVigencia(), valid.fimVigencia()
         );
 
@@ -460,7 +438,10 @@ class UsuarioServiceTest {
                 SituacaoUsuario.PENDENTE,
                 LocalDateTime.of(2026, 8, 21, 14, 0)
         );
-        when(usuarioRepository.findById(usuario.getId())).thenReturn(Optional.of(usuario));
+        Funcionario funcionario = funcionario(usuario, "Farmacêutica", "12345678901");
+        funcionario.setCrf("PR-12345");
+        when(usuarioRepository.findByIdForUpdate(usuario.getId())).thenReturn(Optional.of(usuario));
+        when(funcionarioRepository.findByUsuarioId(usuario.getId())).thenReturn(Optional.of(funcionario));
 
         usuarioService.aprovar(usuario.getId());
 
@@ -481,10 +462,50 @@ class UsuarioServiceTest {
                 SituacaoUsuario.ATIVO,
                 LocalDateTime.of(2026, 8, 21, 15, 0)
         );
-        when(usuarioRepository.findById(usuario.getId())).thenReturn(Optional.of(usuario));
+        when(usuarioRepository.findByIdForUpdate(usuario.getId())).thenReturn(Optional.of(usuario));
 
         assertThatThrownBy(() -> usuarioService.aprovar(usuario.getId()))
-                .isInstanceOf(BusinessRuleException.class);
+                .isInstanceOf(ConflictException.class);
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    void refusesToApprovePharmacistWithoutRequiredProfessionalData() {
+        Usuario usuario = usuario(
+                "incompleta@fen.br",
+                Role.FARMACEUTICO,
+                SituacaoUsuario.PENDENTE,
+                LocalDateTime.of(2026, 8, 21, 15, 30)
+        );
+        Funcionario funcionario = funcionario(usuario, "Farmacêutica Incompleta", "12345678901");
+        when(usuarioRepository.findByIdForUpdate(usuario.getId())).thenReturn(Optional.of(usuario));
+        when(funcionarioRepository.findByUsuarioId(usuario.getId())).thenReturn(Optional.of(funcionario));
+
+        assertThatThrownBy(() -> usuarioService.aprovar(usuario.getId()))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("CRF é obrigatório para farmacêutico");
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    void refusesToApproveInternWithIneligibleSupervisor() {
+        Usuario usuario = usuario(
+                "estagiaria.incompleta@fen.br",
+                Role.ESTAGIARIO,
+                SituacaoUsuario.PENDENTE,
+                LocalDateTime.of(2026, 8, 21, 15, 45)
+        );
+        Funcionario funcionario = funcionario(usuario, "Estagiária", "98765432100");
+        funcionario.setTipoEstagio(TipoEstagio.OBRIGATORIO);
+        funcionario.setInicioVigencia(LocalDate.of(2026, 8, 1));
+        funcionario.setFimVigencia(LocalDate.of(2026, 12, 1));
+        funcionario.setSupervisor(supervisor(Role.ESTAGIARIO, SituacaoUsuario.ATIVO));
+        when(usuarioRepository.findByIdForUpdate(usuario.getId())).thenReturn(Optional.of(usuario));
+        when(funcionarioRepository.findByUsuarioId(usuario.getId())).thenReturn(Optional.of(funcionario));
+
+        assertThatThrownBy(() -> usuarioService.aprovar(usuario.getId()))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("Supervisor inválido");
         verify(usuarioRepository, never()).save(any());
     }
 
@@ -547,7 +568,6 @@ class UsuarioServiceTest {
                 "segredo123",
                 role,
                 crf,
-                true,
                 null,
                 null,
                 null,
@@ -567,7 +587,6 @@ class UsuarioServiceTest {
                 "estagiaria@fen.br",
                 "segredo123",
                 Role.ESTAGIARIO,
-                null,
                 null,
                 TipoEstagio.OBRIGATORIO,
                 supervisorId,

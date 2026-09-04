@@ -24,7 +24,7 @@ class FuncionarioResourceITTest {
     @Test void adminManagesTechnicalResponsibilityAndOtherRolesAreDenied() throws Exception {
         String admin = login("admin@fen.br", "admin123");
         var registration = mockMvc.perform(post("/api/auth/register").contentType(MediaType.APPLICATION_JSON)
-                .content("{\"nome\":\"Farmacêutica IT\",\"cpf\":\"98765432100\",\"email\":\"farmaceutica.it@fen.br\",\"senha\":\"segredo123\",\"role\":\"FARMACEUTICO\",\"crf\":\"PR-999\",\"responsavelTecnico\":false}"))
+                .content("{\"nome\":\"Farmacêutica IT\",\"cpf\":\"98765432100\",\"email\":\"farmaceutica.it@fen.br\",\"senha\":\"segredo123\",\"role\":\"FARMACEUTICO\",\"crf\":\"PR-999\"}"))
                 .andExpect(status().isCreated()).andReturn();
         String usuarioId = objectMapper.readTree(registration.getResponse().getContentAsString()).get("usuarioId").asString();
         mockMvc.perform(post("/api/admin/usuarios/{id}/aprovar", usuarioId).header(HttpHeaders.AUTHORIZATION, bearer(admin))).andExpect(status().isOk());
@@ -32,6 +32,7 @@ class FuncionarioResourceITTest {
         var list = mockMvc.perform(get("/api/admin/funcionarios").param("query", "farmaceutica.it").header(HttpHeaders.AUTHORIZATION, bearer(admin)))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.content").isArray()).andReturn();
         JsonNode employee = objectMapper.readTree(list.getResponse().getContentAsString()).get("content").get(0);
+        org.assertj.core.api.Assertions.assertThat(employee.get("usuarioId").asText()).isEqualTo(usuarioId);
         String id = employee.get("id").asString();
         var internRegistration = mockMvc.perform(post("/api/auth/register").contentType(MediaType.APPLICATION_JSON)
                 .content("{\"nome\":\"Estagiária IT\",\"cpf\":\"12312312312\",\"email\":\"estagiaria.it@fen.br\",\"senha\":\"segredo123\",\"role\":\"ESTAGIARIO\",\"tipoEstagio\":\"OBRIGATORIO\",\"supervisorId\":\"" + id + "\",\"inicioVigencia\":\"2026-01-01\",\"fimVigencia\":\"2026-12-01\"}"))
@@ -46,6 +47,9 @@ class FuncionarioResourceITTest {
                 .andExpect(status().isOk()).andExpect(jsonPath("$.responsavelTecnico").value(false));
         mockMvc.perform(get("/api/admin/funcionarios").header(HttpHeaders.AUTHORIZATION, bearer(pharmacist))).andExpect(status().isForbidden());
         mockMvc.perform(get("/api/admin/funcionarios").header(HttpHeaders.AUTHORIZATION, bearer(intern))).andExpect(status().isForbidden());
+        mockMvc.perform(post("/api/admin/usuarios/{id}/aprovar", internUserId).header(HttpHeaders.AUTHORIZATION, bearer(pharmacist))).andExpect(status().isForbidden());
+        mockMvc.perform(post("/api/admin/usuarios/{id}/aprovar", internUserId).header(HttpHeaders.AUTHORIZATION, bearer(intern))).andExpect(status().isForbidden());
+        mockMvc.perform(post("/api/admin/usuarios/{id}/aprovar", internUserId)).andExpect(status().isUnauthorized());
         mockMvc.perform(get("/api/admin/funcionarios")).andExpect(status().isUnauthorized());
     }
 
