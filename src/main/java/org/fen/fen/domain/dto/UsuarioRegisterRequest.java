@@ -22,7 +22,6 @@ public record UsuarioRegisterRequest(
         @NotBlank @Size(min = 8, max = 72) @Utf8ByteLength(max = 72) String senha,
         @NotNull Role role,
         @Size(max = 20) String crf,
-        Boolean responsavelTecnico,
         TipoEstagio tipoEstagio,
         UUID supervisorId,
         LocalDate inicioVigencia,

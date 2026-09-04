@@ -98,7 +98,8 @@ public class UsuarioService {
 
     @Transactional
     public void aprovar(UUID id) {
-        Usuario usuario = findPendingUsuario(id);
+        Usuario usuario = findPendingUsuarioForUpdate(id);
+        validateRegistrationForActivation(usuario, findFuncionario(id));
         usuario.setSituacao(SituacaoUsuario.ATIVO);
         usuarioRepository.save(usuario);
     }
@@ -119,11 +120,6 @@ public class UsuarioService {
         if (request.role() == Role.FARMACEUTICO
                 && (request.crf() == null || request.crf().isBlank())) {
             throw new BusinessRuleException("CRF é obrigatório para farmacêutico");
-        }
-        if (request.role() == Role.FARMACEUTICO && request.responsavelTecnico() == null) {
-            throw new BusinessRuleException(
-                    "Indicação de responsável técnico é obrigatória para farmacêutico"
-            );
         }
         if (request.role() == Role.ESTAGIARIO && request.supervisorId() == null) {
             throw new BusinessRuleException("Supervisor é obrigatório para estagiário");
@@ -174,6 +170,46 @@ public class UsuarioService {
             throw new BusinessRuleException("Usuário não possui cadastro pendente");
         }
         return usuario;
+    }
+
+    private Usuario findPendingUsuarioForUpdate(UUID id) {
+        Usuario usuario = usuarioRepository.findByIdForUpdate(id)
+                .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado"));
+        if (usuario.getSituacao() != SituacaoUsuario.PENDENTE) {
+            throw new ConflictException("Usuário já possui cadastro processado");
+        }
+        return usuario;
+    }
+
+    private void validateRegistrationForActivation(Usuario usuario, Funcionario funcionario) {
+        if (!PUBLIC_REGISTRATION_ROLES.contains(usuario.getRole())) {
+            throw new BusinessRuleException("Role não permitida para cadastro público");
+        }
+        if (usuario.getEmail() == null || usuario.getEmail().isBlank()
+                || usuario.getPasswordHash() == null || usuario.getPasswordHash().isBlank()) {
+            throw new BusinessRuleException("Cadastro de usuário incompleto");
+        }
+        if (funcionario.getCpf() == null || !funcionario.getCpf().matches("\\d{11}")) {
+            throw new BusinessRuleException("CPF inválido para efetivação");
+        }
+        if (usuario.getRole() == Role.FARMACEUTICO) {
+            if (funcionario.getCrf() == null || funcionario.getCrf().isBlank()) {
+                throw new BusinessRuleException("CRF é obrigatório para farmacêutico");
+            }
+            return;
+        }
+        if (funcionario.getTipoEstagio() == null || funcionario.getSupervisor() == null
+                || funcionario.getInicioVigencia() == null || funcionario.getFimVigencia() == null) {
+            throw new BusinessRuleException("Dados de estágio incompletos para efetivação");
+        }
+        if (funcionario.getFimVigencia().isBefore(funcionario.getInicioVigencia())) {
+            throw new BusinessRuleException("Fim da vigência deve ser igual ou posterior ao início");
+        }
+        Usuario supervisor = funcionario.getSupervisor().getUsuario();
+        if (supervisor.getSituacao() != SituacaoUsuario.ATIVO
+                || (supervisor.getRole() != Role.ADMIN && supervisor.getRole() != Role.FARMACEUTICO)) {
+            throw new BusinessRuleException("Supervisor inválido");
+        }
     }
 
     private Funcionario findFuncionario(UUID usuarioId) {

@@ -91,13 +91,18 @@ class AuthenticationResourceITTest {
                 .andExpect(jsonPath("$.role").value("FARMACEUTICO"))
                 .andExpect(jsonPath("$.situacao").value("PENDENTE"))
                 .andExpect(jsonPath("$.crf").value("PR-12345"))
-                .andExpect(jsonPath("$.responsavelTecnico").value(true))
+                .andExpect(jsonPath("$.responsavelTecnico").value(false))
                 .andExpect(jsonPath("$.senha").doesNotExist())
                 .andExpect(jsonPath("$.passwordHash").doesNotExist());
 
         mockMvc.perform(post("/api/admin/usuarios/{id}/aprovar", pharmacistId)
                         .header(HttpHeaders.AUTHORIZATION, bearer(adminToken)))
                 .andExpect(status().isOk());
+
+        mockMvc.perform(post("/api/admin/usuarios/{id}/aprovar", pharmacistId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(adminToken)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("CONFLICT"));
 
         String pharmacistToken = login(
                 PHARMACIST_EMAIL,
@@ -233,8 +238,7 @@ class AuthenticationResourceITTest {
                   "email": "%s",
                   "senha": "%s",
                   "role": "FARMACEUTICO",
-                  "crf": "%s",
-                  "responsavelTecnico": true
+                  "crf": "%s"
                 }
                 """.formatted(name, cpf, email, password, crf);
     }

@@ -66,6 +66,7 @@ class UsuarioFuncionarioEnversTest extends BaseRepositoryTest {
     void auditsTechnicalResponsibilityWithAuthenticatedAdministrator() {
         TransactionTemplate transaction = new TransactionTemplate(transactionManager);
         RegistrationIds ids = transaction.execute(status -> createRegistration());
+        transaction.executeWithoutResult(status -> usuarioService().aprovar(ids.usuarioId()));
         transaction.executeWithoutResult(status -> {
             SecurityContextHolder.getContext().setAuthentication(
                     new UsernamePasswordAuthenticationToken("admin@fen.br", "N/A",

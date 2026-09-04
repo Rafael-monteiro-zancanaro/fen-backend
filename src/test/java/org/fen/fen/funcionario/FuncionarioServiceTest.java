@@ -28,7 +28,10 @@ class FuncionarioServiceTest {
         Funcionario employee = employee(Role.FARMACEUTICO, "PR-1");
         when(repository.buscar("ana", PageRequest.of(0, 10))).thenReturn(new PageImpl<>(List.of(employee)));
         assertThat(service.listar(" ana ", PageRequest.of(0, 10)).getContent()).singleElement()
-                .extracting(response -> response.email()).isEqualTo("ana@fen.br");
+                .satisfies(response -> {
+                    assertThat(response.email()).isEqualTo("ana@fen.br");
+                    assertThat(response.usuarioId()).isEqualTo(employee.getUsuario().getId());
+                });
     }
 
     @Test void changesTechnicalResponsibilityForPharmacist() {
@@ -46,13 +49,24 @@ class FuncionarioServiceTest {
         verify(repository, never()).save(any());
     }
 
+    @Test void rejectsTechnicalResponsibilityForPendingPharmacist() {
+        Funcionario employee = employee(Role.FARMACEUTICO, "PR-1");
+        employee.getUsuario().setSituacao(SituacaoUsuario.PENDENTE);
+        when(repository.findDetailById(employee.getId())).thenReturn(Optional.of(employee));
+
+        assertThatThrownBy(() -> service.alterarResponsavelTecnico(employee.getId(), true))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("Funcionário ainda não foi efetivado");
+        verify(repository, never()).save(any());
+    }
+
     @Test void reportsMissingEmployee() {
         UUID id = UUID.randomUUID(); when(repository.findDetailById(id)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> service.buscar(id)).isInstanceOf(NoSuchElementException.class);
     }
 
     private Funcionario employee(Role role, String crf) {
-        Usuario user = new Usuario(); user.setEmail("ana@fen.br"); user.setRole(role); user.setSituacao(SituacaoUsuario.ATIVO);
+        Usuario user = new Usuario(); user.setId(UUID.randomUUID()); user.setEmail("ana@fen.br"); user.setRole(role); user.setSituacao(SituacaoUsuario.ATIVO);
         Funcionario employee = new Funcionario(); employee.setId(UUID.randomUUID()); employee.setUsuario(user); employee.setNome("Ana"); employee.setCpf("12345678901"); employee.setCrf(crf); employee.setResponsavelTecnico(false); return employee;
     }
 }

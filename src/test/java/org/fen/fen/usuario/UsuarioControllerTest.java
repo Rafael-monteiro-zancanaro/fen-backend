@@ -176,8 +176,7 @@ class UsuarioControllerTest {
                   "email": "nova@fen.br",
                   "senha": "segredo123",
                   "role": "FARMACEUTICO",
-                  "crf": "PR-12345",
-                  "responsavelTecnico": true
+                  "crf": "PR-12345"
                 }
                 """;
     }
