@@ -59,6 +59,7 @@ public class ServicoFarmaceuticoService {
 
     @Transactional
     public ServicoFarmaceuticoResponse criar(ServicoFarmaceuticoRequest request) {
+        validarExtensaoForaDeRetorno(request);
         Paciente paciente = resolverPacienteParaCriacao(request);
         ServicoFarmaceutico atendimento = novoAtendimento(paciente, request, null, 0);
 
@@ -129,6 +130,7 @@ public class ServicoFarmaceuticoService {
 
     @Transactional
     public ServicoFarmaceuticoResponse atualizar(UUID id, ServicoFarmaceuticoRequest request) {
+        validarExtensaoForaDeRetorno(request);
         ServicoFarmaceutico atendimento = encontrar(id);
         validarPacienteDaEdicao(atendimento, request);
         validarAcompanhamentoDaEdicao(atendimento, request);
@@ -153,7 +155,8 @@ public class ServicoFarmaceuticoService {
                 atendimento.getId(),
                 atendimento.getCodigo(),
                 pacienteService.buscar(atendimento.getPaciente().getId()),
-                progresso(atendimento)
+                progresso(atendimento),
+                podeProlongarNoProximoRetorno(atendimento)
         );
     }
 
@@ -167,6 +170,7 @@ public class ServicoFarmaceuticoService {
         validarPacienteDoRetorno(anterior, request);
 
         int proximaPosicao = anterior.getNumeroRetorno() + 1;
+        aplicarExtensaoNoUltimoRetorno(acompanhamento, request.followUpExtension(), proximaPosicao);
         anterior.setStatusPersistido(StatusServicoFarmaceutico.CONCLUIDO);
 
         ServicoFarmaceutico retorno = novoAtendimento(
@@ -404,6 +408,32 @@ public class ServicoFarmaceuticoService {
         }
     }
 
+    private void validarExtensaoForaDeRetorno(ServicoFarmaceuticoRequest request) {
+        if (request.followUpExtension() != null) {
+            throw new BusinessRuleException("Extensão de acompanhamento só pode ser informada ao criar um retorno");
+        }
+    }
+
+    private void aplicarExtensaoNoUltimoRetorno(
+            Acompanhamento acompanhamento,
+            ServicoFarmaceuticoRequest.FollowUpExtension extensao,
+            int proximaPosicao
+    ) {
+        if (extensao == null) {
+            return;
+        }
+
+        if (proximaPosicao != acompanhamento.getQuantidadeRetornos()) {
+            throw new BusinessRuleException("Acompanhamento só pode ser prolongado no último retorno previsto");
+        }
+
+        acompanhamento.setQuantidadeRetornos(Math.addExact(
+                acompanhamento.getQuantidadeRetornos(),
+                extensao.additionalReturns()
+        ));
+        acompanhamento.setIntervaloRetornoDias(extensao.returnIntervalDays());
+    }
+
     private void validarPacienteDoRetorno(ServicoFarmaceutico anterior, ServicoFarmaceuticoRequest request) {
         if (request.patient() != null || request.patientId() == null
                 || !request.patientId().equals(anterior.getPaciente().getId())) {
@@ -471,6 +501,18 @@ public class ServicoFarmaceuticoService {
                 podeProsseguir ? retornosRealizados + 1 : null,
                 podeProsseguir
         );
+    }
+
+    private boolean podeProlongarNoProximoRetorno(ServicoFarmaceutico atendimento) {
+        Acompanhamento acompanhamento = atendimento.getAcompanhamento();
+        if (acompanhamento == null) {
+            return false;
+        }
+
+        int proximoRetorno = atendimento.getNumeroRetorno() + 1;
+        return proximoRetorno == acompanhamento.getQuantidadeRetornos()
+                && acompanhamento.getEncerradoEm() == null
+                && statusResolver.resolver(atendimento) != StatusServicoFarmaceutico.CONCLUIDO;
     }
 
     private ServicoFarmaceuticoResumoResponse resumo(ServicoFarmaceutico atendimento) {

@@ -11,8 +11,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import tools.jackson.databind.ObjectMapper;
 
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -95,6 +100,83 @@ class ServicoFarmaceuticoResourceITTest {
     }
 
     @Test
+    void prolongaAcompanhamentoNoUltimoRetornoSemCriarNovaCadeia() throws Exception {
+        String token = login();
+        String patientId = criarPaciente(token);
+        MvcResult inicial = mockMvc.perform(post("/api/servicos-farmaceuticos")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"patientId\":\"" + patientId
+                                + "\",\"followUp\":{\"returnIntervalDays\":7,\"returnCount\":3}}"))
+                .andExpect(status().isCreated())
+                .andReturn();
+        String chainId = nestedField(inicial, "followUpLink", "chainId");
+
+        MvcResult primeiroRetorno = mockMvc.perform(post("/api/servicos-farmaceuticos/{id}/retornos", field(inicial, "id"))
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"patientId\":\"" + patientId + "\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.status").value("AGUARDANDO_RETORNO"))
+                .andReturn();
+
+        MvcResult segundoRetorno = mockMvc.perform(post("/api/servicos-farmaceuticos/{id}/retornos", field(primeiroRetorno, "id"))
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"patientId\":\"" + patientId + "\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.status").value("AGUARDANDO_RETORNO"))
+                .andReturn();
+
+        mockMvc.perform(get("/api/servicos-farmaceuticos/{id}/continuacao", field(segundoRetorno, "id"))
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.canExtendFollowUp").value(true));
+
+        MvcResult ultimoRetorno = mockMvc.perform(post("/api/servicos-farmaceuticos/{id}/retornos", field(segundoRetorno, "id"))
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"patientId\":\"" + patientId + "\",\"followUpExtension\":{"
+                                + "\"additionalReturns\":2,\"returnIntervalDays\":7}}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.status").value("AGUARDANDO_RETORNO"))
+                .andExpect(jsonPath("$.followUp.returnCount").value(5))
+                .andExpect(jsonPath("$.followUpProgress.completedReturns").value(3))
+                .andExpect(jsonPath("$.followUpProgress.nextReturnNumber").value(4))
+                .andReturn();
+
+        mockMvc.perform(get("/api/servicos-farmaceuticos/{id}", field(ultimoRetorno, "id"))
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.followUpLink.originAttendanceId").value(field(inicial, "id")))
+                .andExpect(jsonPath("$.followUpLink.chainId").value(chainId));
+
+        mockMvc.perform(post("/api/servicos-farmaceuticos/{id}/retornos", field(segundoRetorno, "id"))
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"patientId\":\"" + patientId + "\",\"followUpExtension\":{"
+                                + "\"additionalReturns\":2,\"returnIntervalDays\":7}}"))
+                .andExpect(status().isConflict());
+
+        MvcResult quartoRetorno = mockMvc.perform(post("/api/servicos-farmaceuticos/{id}/retornos", field(ultimoRetorno, "id"))
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"patientId\":\"" + patientId + "\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.status").value("AGUARDANDO_RETORNO"))
+                .andExpect(jsonPath("$.followUpProgress.nextReturnNumber").value(5))
+                .andReturn();
+
+        mockMvc.perform(post("/api/servicos-farmaceuticos/{id}/retornos", field(quartoRetorno, "id"))
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"patientId\":\"" + patientId + "\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.status").value("CONCLUIDO"))
+                .andExpect(jsonPath("$.followUpProgress.canContinue").value(false));
+    }
+
+    @Test
     void exigeAutenticacaoParaListagem() throws Exception {
         mockMvc.perform(get("/api/servicos-farmaceuticos"))
                 .andExpect(status().isUnauthorized());
@@ -126,6 +208,90 @@ class ServicoFarmaceuticoResourceITTest {
                 .andExpect(jsonPath("$.followUp.returnIntervalDays").value(7))
                 .andExpect(jsonPath("$.followUp.returnCount").value(2))
                 .andExpect(jsonPath("$.followUpHistory.length()").value(1));
+    }
+
+    @Test
+    void rejeitaExtensaoForaDoUltimoRetornoEComQuantidadeInvalida() throws Exception {
+        String token = login();
+        String patientId = criarPaciente(token);
+        MvcResult inicial = mockMvc.perform(post("/api/servicos-farmaceuticos")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"patientId\":\"" + patientId
+                                + "\",\"followUp\":{\"returnIntervalDays\":7,\"returnCount\":2}}"))
+                .andExpect(status().isCreated())
+                .andReturn();
+        String initialId = field(inicial, "id");
+
+        mockMvc.perform(post("/api/servicos-farmaceuticos")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"patientId\":\"" + patientId + "\",\"followUpExtension\":{"
+                                + "\"additionalReturns\":1,\"returnIntervalDays\":7}}"))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(post("/api/servicos-farmaceuticos/{id}/retornos", initialId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"patientId\":\"" + patientId + "\",\"followUpExtension\":{"
+                                + "\"additionalReturns\":1,\"returnIntervalDays\":7}}"))
+                .andExpect(status().isBadRequest());
+
+        MvcResult primeiroRetorno = mockMvc.perform(post("/api/servicos-farmaceuticos/{id}/retornos", initialId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"patientId\":\"" + patientId + "\"}"))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        for (int additionalReturns : new int[]{0, -1}) {
+            mockMvc.perform(post("/api/servicos-farmaceuticos/{id}/retornos", field(primeiroRetorno, "id"))
+                            .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"patientId\":\"" + patientId + "\",\"followUpExtension\":{"
+                                    + "\"additionalReturns\":" + additionalReturns + ",\"returnIntervalDays\":7}}"))
+                    .andExpect(status().isBadRequest());
+        }
+    }
+
+    @Test
+    void permiteApenasUmaExtensaoConcorrenteDoMesmoUltimoRetorno() throws Exception {
+        String token = login();
+        String patientId = criarPaciente(token);
+        MvcResult inicial = mockMvc.perform(post("/api/servicos-farmaceuticos")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"patientId\":\"" + patientId
+                                + "\",\"followUp\":{\"returnIntervalDays\":7,\"returnCount\":2}}"))
+                .andExpect(status().isCreated())
+                .andReturn();
+        MvcResult primeiroRetorno = mockMvc.perform(post("/api/servicos-farmaceuticos/{id}/retornos", field(inicial, "id"))
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"patientId\":\"" + patientId + "\"}"))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        CountDownLatch ready = new CountDownLatch(2);
+        CountDownLatch start = new CountDownLatch(1);
+        try {
+            var attempts = List.of(
+                    executor.submit(() -> criarExtensaoConcorrente(
+                            field(primeiroRetorno, "id"), patientId, token, ready, start
+                    )),
+                    executor.submit(() -> criarExtensaoConcorrente(
+                            field(primeiroRetorno, "id"), patientId, token, ready, start
+                    ))
+            );
+            ready.await();
+            start.countDown();
+
+            assertThat(List.of(attempts.get(0).get(), attempts.get(1).get()))
+                    .containsExactlyInAnyOrder(201, 409);
+        } finally {
+            executor.shutdownNow();
+        }
     }
 
     @Test
@@ -222,6 +388,25 @@ class ServicoFarmaceuticoResourceITTest {
         return field(result, "id");
     }
 
+    private int criarExtensaoConcorrente(
+            String previousAttendanceId,
+            String patientId,
+            String token,
+            CountDownLatch ready,
+            CountDownLatch start
+    ) throws Exception {
+        ready.countDown();
+        start.await();
+        return mockMvc.perform(post("/api/servicos-farmaceuticos/{id}/retornos", previousAttendanceId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"patientId\":\"" + patientId + "\",\"followUpExtension\":{"
+                                + "\"additionalReturns\":1,\"returnIntervalDays\":7}}"))
+                .andReturn()
+                .getResponse()
+                .getStatus();
+    }
+
     private String criarMedicamento(String token, String name, String administrationRoute) throws Exception {
         MvcResult result = mockMvc.perform(post("/api/medicamentos")
                         .header(HttpHeaders.AUTHORIZATION, bearer(token))
@@ -245,6 +430,10 @@ class ServicoFarmaceuticoResourceITTest {
 
     private String field(MvcResult result, String field) throws Exception {
         return objectMapper.readTree(result.getResponse().getContentAsString()).get(field).asString();
+    }
+
+    private String nestedField(MvcResult result, String parent, String field) throws Exception {
+        return objectMapper.readTree(result.getResponse().getContentAsString()).get(parent).get(field).asString();
     }
 
     private String bearer(String token) {
