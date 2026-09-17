@@ -34,4 +34,27 @@ class ServicoFarmaceuticoMapperTest {
         assertThat(response.prescriberName()).isEqualTo("Dra. Ana");
         assertThat(response.prescriberRegistration()).isEqualTo("CRM 123");
     }
+
+    @Test
+    void preservaMedicamentoHistoricoDeServicosSemDuplicaLoNoAcompanhamentoFarmacoterapeutico() {
+        Medicamento medicamento = new Medicamento("Paracetamol", "750 mg", "Oral");
+        MedicamentoAtendimento item = new MedicamentoAtendimento();
+        item.setMedicamento(medicamento);
+        item.setTipoServico(TipoServicoMedicamento.SERVICOS_FARMACEUTICOS);
+        item.setLote("LEG-01");
+        item.setValidade(LocalDate.of(2027, 1, 1));
+        item.setPosologia("1 comprimido");
+
+        ServicoFarmaceutico atendimento = new ServicoFarmaceutico();
+        atendimento.setAcompanhamentoFarmacoterapeutico(true);
+        atendimento.adicionarMedicamento(item);
+
+        var acompanhamento = ServicoFarmaceuticoMapper.pharmacotherapeuticFollowUp(atendimento);
+
+        assertThat(ServicoFarmaceuticoMapper.medications(
+                atendimento, TipoServicoMedicamento.SERVICOS_FARMACEUTICOS
+        )).extracting(response -> response.batch()).containsExactly("LEG-01");
+        assertThat(acompanhamento).isNotNull();
+        assertThat(acompanhamento.medications()).isEmpty();
+    }
 }

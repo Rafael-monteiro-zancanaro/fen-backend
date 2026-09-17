@@ -13,7 +13,9 @@ import java.util.UUID;
 public record ServicoFarmaceuticoRequest(
         UUID patientId, @Valid PacienteRequest patient, @Valid Care care,
         @Valid Injectable injectable, @Valid Inhalotherapy inhalotherapy,
-        @Valid ComplementaryServices complementaryServices, @Valid FollowUp followUp,
+        @Valid ComplementaryServices complementaryServices,
+        @Valid PharmacotherapeuticFollowUp pharmacotherapeuticFollowUp,
+        @Valid FollowUp followUp,
         @Valid FollowUpExtension followUpExtension) {
     public record Care(
             BigDecimal bloodGlucose,
@@ -31,8 +33,13 @@ public record ServicoFarmaceuticoRequest(
 
     public record ComplementaryServices(
             Boolean homeCare,
-            Boolean pharmacotherapeuticFollowUp,
             Boolean minorDisorderIndication,
+            String signsAndSymptoms,
+            @NotNull List<@Valid MedicamentoAtendimentoRequest> medications
+    ) {
+    }
+
+    public record PharmacotherapeuticFollowUp(
             String signsAndSymptoms,
             @NotNull List<@Valid MedicamentoAtendimentoRequest> medications
     ) {

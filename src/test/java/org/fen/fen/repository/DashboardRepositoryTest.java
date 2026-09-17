@@ -54,7 +54,7 @@ class DashboardRepositoryTest extends BaseRepositoryTest {
         ServicoFarmaceutico today = acompanhar(patient, 1003L, TODAY);
         DadosServicosFarmaceuticos complementary = new DadosServicosFarmaceuticos();
         complementary.setAssistenciaDomiciliar(false);
-        complementary.setAcompanhamentoFarmacoterapeutico(true);
+        today.setAcompanhamentoFarmacoterapeutico(true);
         complementary.setIndicacaoTranstornosMenores(false);
         today.setDadosServicosFarmaceuticos(complementary);
         repository.saveAndFlush(today);
@@ -84,7 +84,8 @@ class DashboardRepositoryTest extends BaseRepositoryTest {
         assertThat(repository.contarCuidadosFarmaceuticos()).isEqualTo(1L);
         assertThat(repository.contarAplicacoesInjetaveis()).isEqualTo(2L);
         assertThat(repository.contarInaloterapias()).isEqualTo(1L);
-        assertThat(repository.contarServicosFarmaceuticos()).isEqualTo(1L);
+        assertThat(repository.contarServicosFarmaceuticos()).isEqualTo(0L);
+        assertThat(repository.contarAcompanhamentosFarmacoterapeuticos()).isEqualTo(1L);
         assertThat(repository.countByStatusPersistido(StatusServicoFarmaceutico.CONCLUIDO)).isEqualTo(2L);
 
         assertThat(repository.listar("", "", "AGUARDANDO_RETORNO", false, TODAY, PageRequest.of(0, 10))

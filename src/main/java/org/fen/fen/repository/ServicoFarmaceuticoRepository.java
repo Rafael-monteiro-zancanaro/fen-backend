@@ -66,10 +66,9 @@ public interface ServicoFarmaceuticoRepository extends JpaRepository<ServicoFarm
 
     @Query("""
             select count(s) from ServicoFarmaceutico s
-            where s.dadosServicosFarmaceuticos.assistenciaDomiciliar is not null
-               or s.dadosServicosFarmaceuticos.acompanhamentoFarmacoterapeutico is not null
-               or s.dadosServicosFarmaceuticos.indicacaoTranstornosMenores is not null
-               or s.dadosServicosFarmaceuticos.sinaisESintomas is not null
+            where s.dadosServicosFarmaceuticos.assistenciaDomiciliar = true
+               or s.dadosServicosFarmaceuticos.indicacaoTranstornosMenores = true
+               or s.dadosServicosFarmaceuticos.sinaisESintomas <> ''
                or exists (
                    select 1 from MedicamentoAtendimento ma
                    where ma.servicoFarmaceutico = s
@@ -77,6 +76,12 @@ public interface ServicoFarmaceuticoRepository extends JpaRepository<ServicoFarm
                )
             """)
     long contarServicosFarmaceuticos();
+
+    @Query("""
+            select count(s) from ServicoFarmaceutico s
+            where s.acompanhamentoFarmacoterapeutico = true
+            """)
+    long contarAcompanhamentosFarmacoterapeuticos();
     @EntityGraph(attributePaths = {
             "paciente",
             "medicamentosAtendimento",

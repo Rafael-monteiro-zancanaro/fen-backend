@@ -46,7 +46,7 @@ class DashboardResourceITTest {
                 .andExpect(jsonPath("$.indicators.returnsToday").value(0))
                 .andExpect(jsonPath("$.indicators.totalAttendances").value(0))
                 .andExpect(jsonPath("$.indicators.expired").value(0))
-                .andExpect(jsonPath("$.serviceTypes.length()").value(4))
+                .andExpect(jsonPath("$.serviceTypes.length()").value(5))
                 .andExpect(jsonPath("$.statuses.length()").value(3));
     }
 

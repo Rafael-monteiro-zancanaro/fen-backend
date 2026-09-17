@@ -20,6 +20,7 @@ public record ServicoFarmaceuticoResponse(
         Injectable injectable,
         Inhalotherapy inhalotherapy,
         ComplementaryServices complementaryServices,
+        PharmacotherapeuticFollowUp pharmacotherapeuticFollowUp,
         FollowUp followUp,
         FollowUpLink followUpLink,
         FollowUpProgress followUpProgress,
@@ -55,11 +56,13 @@ public record ServicoFarmaceuticoResponse(
 
     public record ComplementaryServices(
             Boolean homeCare,
-            Boolean pharmacotherapeuticFollowUp,
             Boolean minorDisorderIndication,
             String signsAndSymptoms,
             List<Medication> medications
     ) {
+    }
+
+    public record PharmacotherapeuticFollowUp(String signsAndSymptoms, List<Medication> medications) {
     }
 
     public record FollowUp(Integer returnIntervalDays, Integer returnCount) {

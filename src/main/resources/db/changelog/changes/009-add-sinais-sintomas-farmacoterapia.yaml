@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-sinais-sintomas-farmacoterapia
+      author: codex
+      changes:
+        - addColumn:
+            tableName: servicofarmaceutico
+            columns:
+              - column: { name: sinaisesintomasfarmacoterapia, type: varchar(4000) }
+        - addColumn:
+            schemaName: aud
+            tableName: servicofarmaceutico_aud
+            columns:
+              - column: { name: sinaisesintomasfarmacoterapia, type: varchar(4000) }

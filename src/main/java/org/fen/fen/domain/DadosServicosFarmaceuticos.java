@@ -11,8 +11,6 @@ import lombok.Setter;
 public class DadosServicosFarmaceuticos {
     @Column(name = "assistenciadomiciliar")
     private Boolean assistenciaDomiciliar;
-    @Column(name = "acompanhamentofarmacoterapeutico")
-    private Boolean acompanhamentoFarmacoterapeutico;
     @Column(name = "indicacaotranstornosmenores")
     private Boolean indicacaoTranstornosMenores;
     @Column(name = "sinaisesintomas", length = 4000)
