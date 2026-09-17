@@ -1,0 +1,39 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-anexo-atendimento
+      author: codex
+      changes:
+        - createTable:
+            tableName: anexoatendimento
+            columns:
+              - column: { name: id, type: uuid, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: servicofarmaceuticoid, type: uuid, constraints: { nullable: false } }
+              - column: { name: nomeoriginal, type: varchar(255), constraints: { nullable: false } }
+              - column: { name: chavearmazenamento, type: varchar(36), constraints: { nullable: false } }
+              - column: { name: contenttype, type: varchar(255), constraints: { nullable: false } }
+              - column: { name: tamanho, type: bigint, constraints: { nullable: false } }
+              - column: { name: createdat, type: timestamp, constraints: { nullable: false } }
+              - column: { name: updatedat, type: timestamp }
+              - column: { name: createdby, type: varchar(255) }
+              - column: { name: updatedby, type: varchar(255) }
+        - addUniqueConstraint: { tableName: anexoatendimento, columnNames: chavearmazenamento, constraintName: uk_anexoatendimento_chave }
+        - addForeignKeyConstraint: { baseTableName: anexoatendimento, baseColumnNames: servicofarmaceuticoid, referencedTableName: servicofarmaceutico, referencedColumnNames: id, constraintName: fk_anexoatendimento_servico }
+        - createIndex: { tableName: anexoatendimento, indexName: idx_anexoatendimento_servico, columns: [{ column: { name: servicofarmaceuticoid } }] }
+        - createTable:
+            schemaName: aud
+            tableName: anexoatendimento_aud
+            columns:
+              - column: { name: id, type: uuid, constraints: { nullable: false } }
+              - column: { name: rev, type: int, constraints: { nullable: false } }
+              - column: { name: revtype, type: smallint }
+              - column: { name: servicofarmaceuticoid, type: uuid }
+              - column: { name: nomeoriginal, type: varchar(255) }
+              - column: { name: chavearmazenamento, type: varchar(36) }
+              - column: { name: contenttype, type: varchar(255) }
+              - column: { name: tamanho, type: bigint }
+              - column: { name: createdat, type: timestamp }
+              - column: { name: updatedat, type: timestamp }
+              - column: { name: createdby, type: varchar(255) }
+              - column: { name: updatedby, type: varchar(255) }
+        - addPrimaryKey: { schemaName: aud, tableName: anexoatendimento_aud, columnNames: "id, rev", constraintName: pk_anexoatendimento_aud }
+        - addForeignKeyConstraint: { baseTableSchemaName: aud, baseTableName: anexoatendimento_aud, baseColumnNames: rev, referencedTableSchemaName: aud, referencedTableName: revinfo, referencedColumnNames: rev, constraintName: fk_anexoatendimento_aud_rev }

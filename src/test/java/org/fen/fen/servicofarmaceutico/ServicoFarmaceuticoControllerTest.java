@@ -3,6 +3,7 @@ package org.fen.fen.servicofarmaceutico;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;
 import org.fen.fen.service.ServicoFarmaceuticoService;
+import org.fen.fen.service.AnexoAtendimentoService;
 import org.fen.fen.controller.ServicoFarmaceuticoController;
 import org.fen.fen.error.ApiExceptionHandler;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,10 +22,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ServicoFarmaceuticoControllerTest {
     private MockMvc mockMvc;
     private ServicoFarmaceuticoService service;
+    private AnexoAtendimentoService anexoService;
 
     @BeforeEach void setup() {
         service = mock(ServicoFarmaceuticoService.class);
-        mockMvc = MockMvcBuilders.standaloneSetup(new ServicoFarmaceuticoController(service))
+        anexoService = mock(AnexoAtendimentoService.class);
+        mockMvc = MockMvcBuilders.standaloneSetup(new ServicoFarmaceuticoController(service, anexoService))
                 .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .setControllerAdvice(new ApiExceptionHandler()).build();
     }

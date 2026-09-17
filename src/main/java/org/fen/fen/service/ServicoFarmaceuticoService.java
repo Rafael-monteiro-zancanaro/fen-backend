@@ -16,6 +16,7 @@ import org.fen.fen.mapper.ServicoFarmaceuticoMapper;
 import org.fen.fen.paciente.dto.PacienteRequest;
 import org.fen.fen.paciente.dto.PacienteResponse;
 import org.fen.fen.repository.AcompanhamentoRepository;
+import org.fen.fen.repository.AnexoAtendimentoRepository;
 import org.fen.fen.repository.MedicamentoRepository;
 import org.fen.fen.repository.MedicamentoAtendimentoRepository;
 import org.fen.fen.repository.PacienteRepository;
@@ -49,6 +50,7 @@ public class ServicoFarmaceuticoService {
 
     private final ServicoFarmaceuticoRepository repository;
     private final AcompanhamentoRepository acompanhamentoRepository;
+    private final AnexoAtendimentoRepository anexoAtendimentoRepository;
     private final PacienteRepository pacienteRepository;
     private final MedicamentoRepository medicamentoRepository;
     private final MedicamentoAtendimentoRepository medicamentoAtendimentoRepository;
@@ -91,8 +93,9 @@ public class ServicoFarmaceuticoService {
         String digitos = termo.replaceAll("\\D", "");
         String filtro = status == null || status.equals("TODOS") ? "" : status;
 
-        return repository.listar(termo, digitos, filtro, retornoHoje, LocalDate.now(clock), pageable)
-                .map(this::resumo);
+        Page<ServicoFarmaceutico> pagina = repository.listar(termo, digitos, filtro, retornoHoje, LocalDate.now(clock), pageable);
+        Map<UUID, Long> contagens = contagensAnexos(pagina.getContent());
+        return pagina.map(atendimento -> resumo(atendimento, contagens.getOrDefault(atendimento.getId(), 0L)));
     }
 
     @Transactional(readOnly = true)
@@ -112,6 +115,7 @@ public class ServicoFarmaceuticoService {
                 dataAtendimento,
                 pageable
         );
+        Map<UUID, Long> contagens = contagensAnexos(pagina.getContent());
         Map<UUID, List<MedicamentoAtendimento>> itensPorAtendimento = medicamentoAtendimentoRepository
                 .findByServicoFarmaceuticoIdIn(pagina.getContent().stream().map(ServicoFarmaceutico::getId).toList())
                 .stream()
@@ -121,7 +125,7 @@ public class ServicoFarmaceuticoService {
                 ));
 
         return pagina.map(atendimento -> new ServicoFarmaceuticoBuscaAvancadaResponse(
-                resumo(atendimento),
+                resumo(atendimento, contagens.getOrDefault(atendimento.getId(), 0L)),
                 itensPorAtendimento.getOrDefault(atendimento.getId(), List.of()).stream()
                         .map(ServicoFarmaceuticoMapper::medication)
                         .toList()
@@ -528,7 +532,20 @@ public class ServicoFarmaceuticoService {
                 && statusResolver.resolver(atendimento) != StatusServicoFarmaceutico.CONCLUIDO;
     }
 
-    private ServicoFarmaceuticoResumoResponse resumo(ServicoFarmaceutico atendimento) {
+    private Map<UUID, Long> contagensAnexos(List<ServicoFarmaceutico> atendimentos) {
+        if (atendimentos.isEmpty()) {
+            return Map.of();
+        }
+        return anexoAtendimentoRepository.countByServicoFarmaceuticoIdIn(
+                        atendimentos.stream().map(ServicoFarmaceutico::getId).toList()
+                ).stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        AnexoAtendimentoRepository.AttachmentCount::getServicoFarmaceuticoId,
+                        AnexoAtendimentoRepository.AttachmentCount::getAttachmentCount
+                ));
+    }
+
+    private ServicoFarmaceuticoResumoResponse resumo(ServicoFarmaceutico atendimento, long attachmentCount) {
         ServicoFarmaceuticoResponse.FollowUpProgress progresso = progresso(atendimento);
         return new ServicoFarmaceuticoResumoResponse(
                 atendimento.getId(),
@@ -542,7 +559,8 @@ public class ServicoFarmaceuticoService {
                 progresso.canContinue(),
                 progresso.nextReturnNumber(),
                 progresso.returnCount(),
-                true
+                true,
+                attachmentCount
         );
     }
 

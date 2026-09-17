@@ -38,3 +38,6 @@ out/
 
 .devenv/**
 devenv.lock
+
+# Defesa contra configuração local acidental; o storage padrão fica fora do repositório.
+/fen-attachments/
