@@ -5,6 +5,7 @@ import org.fen.fen.security.JwtAuthenticationFilter;
 import org.fen.fen.security.JwtProperties;
 import org.fen.fen.security.RestAccessDeniedHandler;
 import org.fen.fen.security.RestAuthenticationEntryPoint;
+import org.fen.fen.attachment.AttachmentProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -32,7 +33,7 @@ import java.util.List;
 
 @Configuration
 @EnableMethodSecurity
-@EnableConfigurationProperties(JwtProperties.class)
+@EnableConfigurationProperties({JwtProperties.class, AttachmentProperties.class})
 public class SecurityConfig {
 
     @Bean

@@ -9,4 +9,4 @@ import java.util.UUID;
 public record ServicoFarmaceuticoResumoResponse(UUID id, Long codigo, UUID patientId, String patientName,
         String patientCpf, LocalDate attendanceDate, StatusServicoFarmaceutico status,
         List<String> selectedServices, boolean canContinue, Integer nextReturnNumber,
-        Integer returnCount, boolean editAllowed) {}
+        Integer returnCount, boolean editAllowed, long attachmentCount) {}
