@@ -62,10 +62,22 @@ public final class ServicoFarmaceuticoMapper {
         var servicos = atendimento.getDadosServicosFarmaceuticos();
         return new ServicoFarmaceuticoResponse.ComplementaryServices(
                 servicos.getAssistenciaDomiciliar(),
-                servicos.getAcompanhamentoFarmacoterapeutico(),
                 servicos.getIndicacaoTranstornosMenores(),
                 servicos.getSinaisESintomas(),
                 medications(atendimento, TipoServicoMedicamento.SERVICOS_FARMACEUTICOS)
+        );
+    }
+
+    public static ServicoFarmaceuticoResponse.PharmacotherapeuticFollowUp pharmacotherapeuticFollowUp(
+            ServicoFarmaceutico atendimento
+    ) {
+        if (!Boolean.TRUE.equals(atendimento.getAcompanhamentoFarmacoterapeutico())) {
+            return null;
+        }
+
+        return new ServicoFarmaceuticoResponse.PharmacotherapeuticFollowUp(
+                atendimento.getSinaisESintomasFarmacoterapia(),
+                medications(atendimento, TipoServicoMedicamento.ACOMPANHAMENTO_FARMACOTERAPEUTICO)
         );
     }
 

@@ -41,6 +41,7 @@ class DashboardServiceTest {
         when(repository.contarAplicacoesInjetaveis()).thenReturn(2L);
         when(repository.contarInaloterapias()).thenReturn(1L);
         when(repository.contarServicosFarmaceuticos()).thenReturn(0L);
+        when(repository.contarAcompanhamentosFarmacoterapeuticos()).thenReturn(5L);
 
         DashboardResponse response = service.buscarResumo();
 
@@ -50,7 +51,8 @@ class DashboardServiceTest {
                 new DashboardResponse.ServiceTypeCount("cuidados-farmaceuticos", 4L),
                 new DashboardResponse.ServiceTypeCount("aplicacao-injetaveis", 2L),
                 new DashboardResponse.ServiceTypeCount("inaloterapia", 1L),
-                new DashboardResponse.ServiceTypeCount("servicos-farmaceuticos", 0L)
+                new DashboardResponse.ServiceTypeCount("servicos-farmaceuticos", 0L),
+                new DashboardResponse.ServiceTypeCount("acompanhamento-farmacoterapeutico", 5L)
         );
         assertThat(response.statuses()).containsExactly(
                 new DashboardResponse.StatusCount(StatusServicoFarmaceutico.CONCLUIDO, 3L),

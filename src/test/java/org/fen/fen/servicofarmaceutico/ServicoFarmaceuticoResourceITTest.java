@@ -344,6 +344,101 @@ class ServicoFarmaceuticoResourceITTest {
     }
 
     @Test
+    void separaMedicamentosDeServicosFarmaceuticosEDoAcompanhamentoFarmacoterapeutico() throws Exception {
+        String token = login();
+        String patientId = criarPaciente(token);
+        String servicosMedicationId = criarMedicamento(token, "Paracetamol", "Oral");
+        String acompanhamentoMedicationId = criarMedicamento(token, "Losartana", "Oral");
+
+        MvcResult created = mockMvc.perform(post("/api/servicos-farmaceuticos")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "patientId":"%s",
+                                  "complementaryServices":{
+                                    "homeCare":true,
+                                    "minorDisorderIndication":false,
+                                    "signsAndSymptoms":"Dor leve",
+                                    "medications":[
+                                      {"medicationId":"%s","batch":"SVC-01","expirationDate":"2027-04-01","dosage":"1 comprimido"}
+                                    ]
+                                  },
+                                  "pharmacotherapeuticFollowUp":{
+                                    "signsAndSymptoms":"Pressão arterial instável",
+                                    "medications":[
+                                      {"medicationId":"%s","batch":"AFT-01","expirationDate":"2027-05-01","dosage":"Uso contínuo"}
+                                    ]
+                                  }
+                                }
+                                """.formatted(patientId, servicosMedicationId, acompanhamentoMedicationId)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.selectedServices").value(org.hamcrest.Matchers.containsInAnyOrder(
+                        "servicos-farmaceuticos", "acompanhamento-farmacoterapeutico"
+                )))
+                .andExpect(jsonPath("$.complementaryServices.pharmacotherapeuticFollowUp").doesNotExist())
+                .andExpect(jsonPath("$.complementaryServices.medications[0].batch").value("SVC-01"))
+                .andExpect(jsonPath("$.pharmacotherapeuticFollowUp.signsAndSymptoms").value("Pressão arterial instável"))
+                .andExpect(jsonPath("$.pharmacotherapeuticFollowUp.medications[0].batch").value("AFT-01"))
+                .andReturn();
+
+        mockMvc.perform(get("/api/servicos-farmaceuticos/{id}", field(created, "id"))
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.complementaryServices.medications[0].batch").value("SVC-01"))
+                .andExpect(jsonPath("$.pharmacotherapeuticFollowUp.signsAndSymptoms").value("Pressão arterial instável"))
+                .andExpect(jsonPath("$.pharmacotherapeuticFollowUp.medications[0].batch").value("AFT-01"));
+    }
+
+    @Test
+    void persisteServicosFarmaceuticosEAcompanhamentoFarmacoterapeuticoDeFormaIndependente() throws Exception {
+        String token = login();
+        String patientId = criarPaciente(token);
+
+        mockMvc.perform(post("/api/servicos-farmaceuticos")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"patientId":"%s","complementaryServices":{
+                                  "homeCare":true,"minorDisorderIndication":false,"signsAndSymptoms":"","medications":[]}}
+                                """.formatted(patientId)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.selectedServices").value(org.hamcrest.Matchers.contains("servicos-farmaceuticos")))
+                .andExpect(jsonPath("$.pharmacotherapeuticFollowUp").doesNotExist());
+
+        mockMvc.perform(post("/api/servicos-farmaceuticos")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"patientId":"%s","pharmacotherapeuticFollowUp":{"medications":[]}}
+                                """.formatted(patientId)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.selectedServices").value(org.hamcrest.Matchers.contains(
+                        "acompanhamento-farmacoterapeutico")))
+                .andExpect(jsonPath("$.complementaryServices").doesNotExist())
+                .andExpect(jsonPath("$.pharmacotherapeuticFollowUp.medications").isEmpty());
+
+        mockMvc.perform(post("/api/servicos-farmaceuticos")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"patientId":"%s","complementaryServices":{
+                                  "homeCare":true,"minorDisorderIndication":false,"signsAndSymptoms":"","medications":[]},
+                                  "pharmacotherapeuticFollowUp":{"medications":[]}}
+                                """.formatted(patientId)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.selectedServices").value(org.hamcrest.Matchers.containsInAnyOrder(
+                        "servicos-farmaceuticos", "acompanhamento-farmacoterapeutico")));
+
+        mockMvc.perform(post("/api/servicos-farmaceuticos")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"patientId\":\"%s\"}".formatted(patientId)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.selectedServices").isEmpty());
+    }
+
+    @Test
     void naoPersisteNemExpõeCamposObsoletosDoStepDeServicosFarmaceuticos() throws Exception {
         String token = login();
         String patientId = criarPaciente(token);
@@ -357,7 +452,6 @@ class ServicoFarmaceuticoResourceITTest {
                                   "patientId":"%s",
                                   "complementaryServices":{
                                     "homeCare":false,
-                                    "pharmacotherapeuticFollowUp":true,
                                     "minorDisorderIndication":false,
                                     "signsAndSymptoms":"Uso contínuo",
                                     "medications":[
@@ -365,7 +459,8 @@ class ServicoFarmaceuticoResourceITTest {
                                     ],
                                     "recordNumber":"F-001",
                                     "attendanceDate":"2026-08-30"
-                                  }
+                                  },
+                                  "pharmacotherapeuticFollowUp":{"medications":[]}
                                 }
                                 """.formatted(patientId, medicationId)))
                 .andExpect(status().isCreated())

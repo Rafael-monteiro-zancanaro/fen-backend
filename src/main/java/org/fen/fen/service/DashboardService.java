@@ -38,7 +38,10 @@ public class DashboardService {
                                 "aplicacao-injetaveis", repository.contarAplicacoesInjetaveis()),
                         new DashboardResponse.ServiceTypeCount("inaloterapia", repository.contarInaloterapias()),
                         new DashboardResponse.ServiceTypeCount(
-                                "servicos-farmaceuticos", repository.contarServicosFarmaceuticos())
+                                "servicos-farmaceuticos", repository.contarServicosFarmaceuticos()),
+                        new DashboardResponse.ServiceTypeCount(
+                                "acompanhamento-farmacoterapeutico",
+                                repository.contarAcompanhamentosFarmacoterapeuticos())
                 ),
                 List.of(
                         new DashboardResponse.StatusCount(

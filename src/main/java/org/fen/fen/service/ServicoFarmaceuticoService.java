@@ -281,6 +281,12 @@ public class ServicoFarmaceuticoService {
         atendimento.setDadosServicosFarmaceuticos(
                 request.complementaryServices() == null ? null : complementar(request.complementaryServices())
         );
+        atendimento.setAcompanhamentoFarmacoterapeutico(request.pharmacotherapeuticFollowUp() != null);
+        atendimento.setSinaisESintomasFarmacoterapia(
+                request.pharmacotherapeuticFollowUp() == null
+                        ? null
+                        : normalizarOpcional(request.pharmacotherapeuticFollowUp().signsAndSymptoms())
+        );
         sincronizarMedicamentos(atendimento, request);
     }
 
@@ -300,6 +306,13 @@ public class ServicoFarmaceuticoService {
                 solicitados,
                 request.complementaryServices() == null ? List.of() : request.complementaryServices().medications(),
                 TipoServicoMedicamento.SERVICOS_FARMACEUTICOS
+        );
+        adicionarSolicitados(
+                solicitados,
+                request.pharmacotherapeuticFollowUp() == null
+                        ? List.of()
+                        : request.pharmacotherapeuticFollowUp().medications(),
+                TipoServicoMedicamento.ACOMPANHAMENTO_FARMACOTERAPEUTICO
         );
 
         Set<UUID> medicationIds = solicitados.stream()
@@ -361,7 +374,8 @@ public class ServicoFarmaceuticoService {
         item.setLote(request.batch().trim());
         item.setValidade(request.expirationDate());
         item.setPosologia(request.dosage().trim());
-        if (solicitado.tipo() == TipoServicoMedicamento.SERVICOS_FARMACEUTICOS) {
+        if (solicitado.tipo() == TipoServicoMedicamento.SERVICOS_FARMACEUTICOS
+                || solicitado.tipo() == TipoServicoMedicamento.ACOMPANHAMENTO_FARMACOTERAPEUTICO) {
             item.setNomePrescritor(null);
             item.setRegistroPrescritor(null);
             return;
@@ -474,7 +488,6 @@ public class ServicoFarmaceuticoService {
     private DadosServicosFarmaceuticos complementar(ServicoFarmaceuticoRequest.ComplementaryServices request) {
         DadosServicosFarmaceuticos servicos = new DadosServicosFarmaceuticos();
         servicos.setAssistenciaDomiciliar(request.homeCare());
-        servicos.setAcompanhamentoFarmacoterapeutico(request.pharmacotherapeuticFollowUp());
         servicos.setIndicacaoTranstornosMenores(request.minorDisorderIndication());
         servicos.setSinaisESintomas(request.signsAndSymptoms());
         return servicos;
@@ -553,6 +566,7 @@ public class ServicoFarmaceuticoService {
                 ServicoFarmaceuticoMapper.injectable(atendimento),
                 ServicoFarmaceuticoMapper.inhalotherapy(atendimento),
                 ServicoFarmaceuticoMapper.complementaryServices(atendimento),
+                ServicoFarmaceuticoMapper.pharmacotherapeuticFollowUp(atendimento),
                 ServicoFarmaceuticoMapper.followUp(acompanhamento),
                 linkAcompanhamento(atendimento),
                 progresso(atendimento),
@@ -574,6 +588,9 @@ public class ServicoFarmaceuticoService {
         }
         if (atendimento.getDadosServicosFarmaceuticos() != null) {
             selecionados.add("servicos-farmaceuticos");
+        }
+        if (Boolean.TRUE.equals(atendimento.getAcompanhamentoFarmacoterapeutico())) {
+            selecionados.add("acompanhamento-farmacoterapeutico");
         }
         return selecionados;
     }

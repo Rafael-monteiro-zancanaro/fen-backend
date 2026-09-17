@@ -41,6 +41,8 @@ public class ServicoFarmaceutico extends AuditableEntity {
     @Column(name = "numeroretorno", nullable = false) private Integer numeroRetorno = 0;
     @Embedded private CuidadosFarmaceuticos cuidadosFarmaceuticos;
     @Embedded private DadosServicosFarmaceuticos dadosServicosFarmaceuticos;
+    @Column(name = "acompanhamentofarmacoterapeutico") private Boolean acompanhamentoFarmacoterapeutico;
+    @Column(name = "sinaisesintomasfarmacoterapia", length = 4000) private String sinaisESintomasFarmacoterapia;
     @OneToMany(mappedBy = "servicoFarmaceutico", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MedicamentoAtendimento> medicamentosAtendimento = new ArrayList<>();
 
