@@ -39,5 +39,10 @@ out/
 .devenv/**
 devenv.lock
 
+# Local environment configuration. Keep the published template versioned.
+.env
+.env.*
+!.env.example
+
 # Defesa contra configuração local acidental; o storage padrão fica fora do repositório.
 /fen-attachments/
