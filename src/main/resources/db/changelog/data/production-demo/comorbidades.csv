@@ -1,0 +1,36 @@
+id,nome,createdat,updatedat,createdby,updatedby
+b2000000-0000-4000-8000-000000000001,Hipertensão arterial sistêmica,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000002,Diabetes mellitus tipo 2,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000003,Diabetes mellitus tipo 1,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000004,Asma,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000005,Doença pulmonar obstrutiva crônica,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000006,Doença renal crônica,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000007,Insuficiência cardíaca,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000008,Gastrite,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000009,Úlcera péptica,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000010,Doença do refluxo gastroesofágico,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000011,Hepatopatia crônica,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000012,Epilepsia,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000013,Depressão,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000014,Transtorno de ansiedade,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000015,Arritmia cardíaca,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000016,Fibrilação atrial,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000017,Hipotireoidismo,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000018,Hipertireoidismo,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000019,Osteoartrose,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000020,Osteoporose,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000021,Gota,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000022,Doença arterial periférica,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000023,Rinite alérgica,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000024,Glaucoma,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000025,Hiperplasia prostática benigna,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000026,Insônia,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000027,Enxaqueca,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000028,Obesidade,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000029,Dislipidemia,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000030,Doença de Parkinson,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000031,Anemia ferropriva,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000032,Doença celíaca,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000033,Psoríase,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000034,Dermatite atópica,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+b2000000-0000-4000-8000-000000000035,Doença inflamatória intestinal,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa

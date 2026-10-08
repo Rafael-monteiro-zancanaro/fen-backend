@@ -80,6 +80,20 @@ Liquibase permanece ativo com `spring.liquibase.contexts=production` e é a
 única ferramenta de evolução do schema; Hibernate não cria, atualiza nem
 remove tabelas.
 
+### Carga demonstrativa fictícia
+
+O changeset `seed-production-demo-data` contém dados estritamente fictícios
+para a produção demonstrativa do TCC: medicamentos, comorbidades, interações,
+pacientes e seus vínculos. Ele pertence ao contexto Liquibase `production` e,
+portanto, será aplicado automaticamente no próximo deploy com o profile
+`prod`. Não cria usuários, funcionários ou atendimentos.
+
+Em um banco Neon que já possui o schema, basta redeployar o backend. O
+Liquibase encontrará o novo changeset, executará a carga uma única vez e o
+registrará em `DATABASECHANGELOG`, sem duplicar registros nos próximos
+deploys. Antes de usar o mesmo banco como produção com dados reais, planeje
+uma migration separada para retirar ou substituir a carga demonstrativa.
+
 ### Limitação operacional: ADMIN inicial
 
 O changeset atual de ADMIN é intencionalmente restrito aos contexts `dev` e
