@@ -1,0 +1,36 @@
+id,nome,unidademedida,viaadministracao,createdat,updatedat,createdby,updatedby
+a1000000-0000-4000-8000-000000000001,Paracetamol,500 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000002,Dipirona,500 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000003,Ibuprofeno,400 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000004,Naproxeno,500 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000005,Diclofenaco,50 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000006,Losartana,50 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000007,Enalapril,10 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000008,Amlodipino,5 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000009,Hidroclorotiazida,25 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000010,Atenolol,50 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000011,Metformina,850 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000012,Glibenclamida,5 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000013,Insulina NPH,100 UI/mL,Subcutânea,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000014,Insulina regular,100 UI/mL,Subcutânea,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000015,Omeprazol,20 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000016,Pantoprazol,40 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000017,Amoxicilina,500 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000018,Azitromicina,500 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000019,Cefalexina,500 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000020,Salbutamol,100 mcg/dose,Inalatória,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000021,Budesonida,32 mcg/dose,Nasal,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000022,Prednisona,20 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000023,Dexametasona,4 mg/mL,Intramuscular,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000024,Loratadina,10 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000025,Cetirizina,10 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000026,Varfarina,5 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000027,Rivaroxabana,20 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000028,Ácido acetilsalicílico,100 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000029,Clopidogrel,75 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000030,Sinvastatina,20 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000031,Levotiroxina,50 mcg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000032,Fluoxetina,20 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000033,Sertralina,50 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000034,Carbamazepina,200 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa
+a1000000-0000-4000-8000-000000000035,Furosemida,40 mg,Oral,2026-10-01 08:00:00,2026-10-01 08:00:00,Carga demonstrativa,Carga demonstrativa

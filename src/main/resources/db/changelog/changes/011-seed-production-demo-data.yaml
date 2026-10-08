@@ -1,0 +1,49 @@
+databaseChangeLog:
+  - changeSet:
+      id: seed-production-demo-data
+      author: codex
+      context: production
+      comment: Carga fictícia e determinística para o ambiente de produção demonstrativo do TCC.
+      changes:
+        - loadData:
+            tableName: medicamento
+            file: db/changelog/data/production-demo/medicamentos.csv
+            encoding: UTF-8
+            columns:
+              - column: { header: id, type: UUID }
+              - column: { header: createdat, type: DATETIME }
+              - column: { header: updatedat, type: DATETIME }
+        - loadData:
+            tableName: comorbidade
+            file: db/changelog/data/production-demo/comorbidades.csv
+            encoding: UTF-8
+            columns:
+              - column: { header: id, type: UUID }
+              - column: { header: createdat, type: DATETIME }
+              - column: { header: updatedat, type: DATETIME }
+        - loadData:
+            tableName: interacao
+            file: db/changelog/data/production-demo/interacoes.csv
+            encoding: UTF-8
+            columns:
+              - column: { header: id, type: UUID }
+              - column: { header: comorbidadeid, type: UUID }
+              - column: { header: medicamentoid, type: UUID }
+              - column: { header: createdat, type: DATETIME }
+              - column: { header: updatedat, type: DATETIME }
+        - loadData:
+            tableName: paciente
+            file: db/changelog/data/production-demo/pacientes.csv
+            encoding: UTF-8
+            columns:
+              - column: { header: id, type: UUID }
+              - column: { header: datanascimento, type: DATE }
+              - column: { header: createdat, type: DATETIME }
+              - column: { header: updatedat, type: DATETIME }
+        - loadData:
+            tableName: pacientecomorbidade
+            file: db/changelog/data/production-demo/paciente-comorbidades.csv
+            encoding: UTF-8
+            columns:
+              - column: { header: pacienteid, type: UUID }
+              - column: { header: comorbidadeid, type: UUID }
